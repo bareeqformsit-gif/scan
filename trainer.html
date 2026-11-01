@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#14323F">
+<title>حضور الدورة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#1D2B32;--mute:#647680;--line:#DCE5E3;--pri:#14323F;--sea:#1F6F78;--mint:#E6F1EF;--ok:#1F6E4C;--okb:#E3F3EB;--late:#8A5E12;--lateb:#FBF0DA;--bad:#9C3029;--badb:#FAE7E5;--exc:#2F5A93;--excb:#E7EEF8}
+  *{box-sizing:border-box}
+  body{margin:0;background:#F4F7F6;color:var(--ink);font-family:"Cairo","Dubai","Segoe UI",Tahoma,sans-serif;font-size:14.5px;line-height:1.6;font-feature-settings:"tnum" 1}
+  header{background:var(--pri);color:#fff;padding:14px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  header h1{font-size:20px;margin:0;font-weight:800}
+  header .m{font-size:12.5px;color:#BFD3D6}
+  header button.b{background:transparent;color:#fff;border-color:rgba(255,255,255,.4)}
+  .sp{flex:1}
+  nav{display:flex;gap:2px;background:#fff;border-bottom:1px solid var(--line);padding:0 10px;overflow-x:auto}
+  nav button{border:0;background:none;font:inherit;font-weight:600;padding:12px 14px;color:var(--mute);border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
+  nav button.on{color:var(--sea);border-bottom-color:var(--sea)}
+  main{max-width:1100px;margin:0 auto;padding:14px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px;min-width:0}
+  .card h3{margin:0 0 10px;font-size:15.5px;font-weight:700;color:var(--pri)}
+  .g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .g2>.card{margin-bottom:0}
+  .g2{margin-bottom:12px}
+  @media(max-width:760px){.g2{grid-template-columns:1fr}}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0;margin-bottom:12px;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .kpi{padding:14px 16px;border-inline-start:1px solid var(--line)}.kpi:first-child{border-inline-start:0}
+  .kpi b{display:block;font-size:28px;font-weight:800;color:var(--pri);line-height:1.3}.kpi b small{font-size:16px;color:var(--mute)}.kpi span{color:var(--mute);font-size:12px}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:7px 9px;border-bottom:1px solid var(--line);text-align:right}
+  th{background:var(--mint);color:var(--pri);font-size:12.5px;font-weight:700}
+  .chip{display:inline-block;padding:1px 10px;border-radius:20px;font-size:12px;font-weight:600}
+  .c-ok{background:var(--okb);color:var(--ok)}.c-late{background:var(--lateb);color:var(--late)}.c-bad{background:var(--badb);color:var(--bad)}.c-exc{background:var(--excb);color:var(--exc)}.c-mute{background:#eef0f4;color:var(--mute)}
+  .bar{height:8px;background:#E6ECEB;border-radius:6px;overflow:hidden;min-width:70px;flex:1}.bar i{display:block;height:100%;background:#2E9E6E}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  input,button.b{font:inherit;border:1px solid #C8D5D2;border-radius:10px;padding:7px 12px;background:#fff;color:var(--ink)}
+  button.b{cursor:pointer;font-weight:700}button.p{background:var(--sea);color:#fff;border-color:var(--sea)}
+  .muted{color:var(--mute);font-size:12px}
+  .tab{display:none}.tab.on{display:block}
+  .empty{padding:24px;text-align:center;color:var(--mute)}
+  .low{color:var(--bad);font-weight:bold}
+  .att-sum{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--mute);margin:8px 0 12px}
+  .att-sum span{display:inline-flex;align-items:center;gap:6px}.att-sum i{width:10px;height:10px;border-radius:3px}.att-sum b{color:var(--pri)}
+  .tw{overflow-x:auto}
+  .tw td,.tw th{white-space:nowrap}
+  tr.st{cursor:pointer}tr.st:hover td{background:#F1F6F5}
+  .wide-only{}
+  @media(max-width:640px){.wide-only{display:none}}
+  .modal{position:fixed;inset:0;background:rgba(20,50,63,.42);display:none;align-items:center;justify-content:center;z-index:45;padding:12px}
+  .modal.on{display:flex}
+  .modal .card{width:min(600px,100%);max-height:90vh;overflow:auto;box-shadow:0 18px 50px rgba(20,50,63,.25);margin:0}
+  h4{margin:16px 0 8px;font-size:14px;color:var(--pri)}
+  /* ---------- طباعة / PDF ---------- */
+  #print{display:none}
+  body.printing header,body.printing nav,body.printing main{display:none}
+  body.printing #print{display:block}
+  #print{max-width:900px;margin:0 auto;padding:24px;background:#fff}
+  #print h1{font-size:22px;margin:0 0 4px;font-weight:800;color:var(--pri)}
+  #print h3{font-size:15px;margin:18px 0 8px;color:var(--pri)}
+  #print .meta{color:var(--mute);margin-bottom:14px;line-height:1.7}
+  #print table{font-size:12px;margin-bottom:16px}
+  #print th,#print td{border:1px solid #D3DEDB;padding:5px 8px}
+  #print .tools{margin-bottom:16px}
+  .pk{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:14px}
+  .pk div{padding:10px 14px;border-inline-start:1px solid var(--line)}.pk div:first-child{border-inline-start:0}
+  .pk b{display:block;font-size:22px;font-weight:800;color:var(--pri)}.pk span{font-size:11.5px;color:var(--mute)}
+  .pgrid{display:grid;grid-template-columns:300px 1fr;gap:14px}
+  .pcard{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:14px;break-inside:avoid}
+  .pcard h3{margin:0 0 8px!important}
+  @media print{
+    @page{size:A4;margin:12mm}
+    body{background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    #print{padding:0;max-width:none}
+    #print .tools{display:none}
+    tr{page-break-inside:avoid}
+    .chip{border:1px solid #ccc}
+    #print .ch-line svg,#print .ch-cols svg{width:100%!important;height:auto!important}
+    #print .ch-cols.scroll{overflow:visible}
+  }
+/*@CH-CSS*/
+  /* ---------- المخططات (CH) ---------- */
+  .ch{position:relative}
+  .ch svg{display:block;overflow:visible;max-width:none;direction:ltr}
+  .ch svg text{font-family:inherit;fill:#647680;font-size:11px}
+  .ch .ch-tick{font-variant-numeric:tabular-nums}
+  .ch .ch-sub{font-size:10.5px;fill:#8696A0}
+  .ch .ch-axt{font-size:11px;fill:#8696A0}
+  .ch .ch-thl{fill:#9C3029;font-size:11px;font-weight:700}
+  .ch .ch-cap{fill:#14323F;font-size:11.5px;font-weight:700;paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
+  .ch .ch-end{fill:#14323F;font-size:12.5px;font-weight:800;paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
+  .ch-cols.scroll{overflow-x:auto;overflow-y:hidden;scrollbar-width:thin}
+  .ch-col{transition:opacity .18s}
+  .ch svg.dim .ch-col:not(.hl){opacity:.35}
+  .ch-hit{cursor:pointer;outline:none}
+  .ch-hit:focus-visible{outline:none;stroke:#1F6F78;stroke-width:1.5;stroke-dasharray:3 3}
+  .ch-cross{display:none;pointer-events:none}
+  .ch svg.xon .ch-cross{display:block}
+  .ch-arc{transition:stroke-width .18s,opacity .18s;cursor:pointer;outline:none}
+  .ch svg.dim .ch-arc:not(.hl){opacity:.32}
+  .ch-donut{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+  .ch-donut.solo{justify-content:center}
+  .ch-dfig{position:relative;flex:none}
+  .ch-dc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;padding:0 18%}
+  .ch-dc b{font-weight:800;color:#14323F;line-height:1.1}
+  .ch-dc span{font-size:11.5px;color:#647680;font-weight:600;line-height:1.35;margin-top:2px}
+  .ch-legend{display:flex;flex-direction:column;gap:2px;flex:1;min-width:170px;max-width:300px}
+  .ch-li{display:flex;align-items:center;gap:9px;font-size:13px;padding:4px 8px;border-radius:9px;transition:background .15s}
+  .ch-li.hl,.ch-li:hover{background:#F1F6F5}
+  .ch-li i{width:10px;height:10px;border-radius:3px;flex:none}
+  .ch-li span{flex:1;color:#1D2B32}
+  .ch-li b{font-weight:700;color:#14323F;font-variant-numeric:tabular-nums}
+  .ch-li em{font-style:normal;color:#647680;font-size:12px;min-width:36px;text-align:left;font-variant-numeric:tabular-nums}
+  .ch-li.zero{opacity:.45}
+  .ch-tip{position:fixed;z-index:200;background:#fff;border:1px solid #DCE5E3;border-radius:11px;box-shadow:0 12px 32px rgba(20,50,63,.16);
+          padding:9px 12px;font-size:12.5px;pointer-events:none;opacity:0;transform:translateY(4px);transition:opacity .12s,transform .12s;
+          min-width:130px;max-width:330px;direction:rtl;text-align:right;font-family:"Cairo","Dubai","Segoe UI",Tahoma,sans-serif;line-height:1.55;color:#1D2B32}
+  .ch-tip.on{opacity:1;transform:none}
+  .ch-tip-t{font-weight:700;color:#14323F;margin-bottom:3px}
+  .ch-tip-r{display:flex;align-items:center;gap:8px}
+  .ch-tip-r b{font-weight:800;color:#14323F;font-variant-numeric:tabular-nums}
+  .ch-tip-r span{color:#647680}
+  .ch-key{width:12px;height:3px;border-radius:2px;flex:none}
+  .ch-tip-f{margin-top:5px;padding-top:5px;border-top:1px solid #EDF2F1;color:#647680}
+  .ch-hbars{display:flex;flex-direction:column;gap:4px}
+  .ch-hrow{display:grid;grid-template-columns:minmax(96px,36%) 1fr 46px;align-items:center;gap:12px;padding:5px 8px;border-radius:9px;outline:none;transition:background .15s}
+  .ch-hrow.hl,.ch-hrow:focus-visible{background:#F1F6F5}
+  .ch-hrow.click{cursor:pointer}
+  .ch-hl{min-width:0;display:flex;flex-direction:column;line-height:1.35}
+  .ch-hl span{font-size:13px;font-weight:600;color:#1D2B32;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ch-hl small{font-size:11px;color:#647680}
+  .ch-htrack{position:relative;height:12px;background:#EDF2F1;border-radius:2px}
+  .ch-htrack i{display:block;height:100%;border-radius:0;border-start-end-radius:4px;border-end-end-radius:4px}
+  .ch-hth{position:absolute;top:-4px;bottom:-4px;width:0;border-inline-start:2px dashed #9C3029;margin-inline-start:-1px}
+  .ch-hv{font-weight:800;color:#14323F;font-size:13px;text-align:left;font-variant-numeric:tabular-nums}
+  .ch-empty{padding:22px;text-align:center;color:#647680;font-size:13px}
+  .ch-seg{display:flex;gap:2px;border-radius:99px;overflow:hidden;background:#EDF2F1;transition:clip-path .8s cubic-bezier(.22,.8,.26,1);clip-path:inset(0 0 0 0)}
+  .ch-seg.grow{clip-path:inset(0 0 0 100%)}
+  .ch-seg i{display:block;min-width:3px;outline:none;transition:filter .15s}
+  .ch-seg i.rest{background:#EDF2F1;min-width:0}
+  .ch-seg i.hl{filter:brightness(1.12) saturate(1.1)}
+  .ch-strip{display:flex;flex-wrap:wrap;gap:3px}
+  .ch-strip i{width:13px;height:13px;border-radius:3px;outline:none;transition:transform .15s,opacity .3s}
+  .ch-strip i.none{background:#E4EAE9}
+  .ch-strip i.hl{transform:scale(1.25)}
+  .ch-strip.small{gap:2px;flex-wrap:nowrap}
+  .ch-strip.small i{width:8px;height:14px;border-radius:2px}
+  .ch-leg{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:12px;color:#647680;margin-top:10px}
+  .ch-leg span{display:inline-flex;align-items:center;gap:6px}
+  .ch-leg i{width:10px;height:10px;border-radius:3px;display:inline-block}
+  .ch-leg i.ln{width:14px;height:3px;border-radius:2px}
+  .ch-leg i.dash{width:16px;height:0;border-radius:0;border-top:2px dashed #9C3029}
+  .ch-leg em{font-style:normal}
+  .ch-spark{display:inline-block;vertical-align:middle}
+  .ch-tbl{display:none;width:100%;border-collapse:collapse;font-size:13px}
+  .ch-tbl th,.ch-tbl td{padding:6px 10px;border-bottom:1px solid #DCE5E3;text-align:right}
+  .ch-tbl th{background:#E6F1EF;color:#14323F;font-weight:700;font-size:12px;position:static}
+  .tbl-on .ch-plot,.tbl-on .ch-leg{display:none}
+  .tbl-on .ch-tbl{display:table}
+  .chd{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
+  .chd>div{flex:1;min-width:0}
+  .chd h3{margin:0!important}
+  .chd .muted{margin-top:1px}
+  .tg{border:1px solid #DCE5E3;background:#fff;color:#647680;border-radius:8px;padding:2px 10px;font:inherit;font-size:12px;font-weight:600;cursor:pointer;flex:none}
+  .tg:hover{border-color:#1F6F78;color:#14323F}
+  @media print{.ch *{transition:none!important}.ch-tip{display:none!important}.tg{display:none}}
+  @media (prefers-reduced-motion:reduce){.ch *{transition:none!important}}
+  /*@CH-CSS-END*/
+</style>
+</head>
+<body>
+<header><div><h1 id="title">حضور الدورة</h1><div class="m" id="sub"></div></div><span class="sp"></span>
+  <span class="m" id="upd"></span><button class="b" onclick="printMode()">طباعة / PDF</button></header>
+<nav><button data-t="day" class="on">الحضور اليومي</button><button data-t="students">الطلاب والنسب</button><button data-t="sessions">الجلسات</button></nav>
+<main>
+  <section class="tab on" id="t-day">
+    <div class="row" style="margin-bottom:12px"><input type="date" id="date"><button class="b p" onclick="load()">عرض</button><span class="muted">يتحدث تلقائيًا كل 30 ثانية</span></div>
+    <div id="dayBody"><div class="empty">جارٍ التحميل…</div></div>
+  </section>
+  <section class="tab" id="t-students">
+    <div class="kpis" id="kpis"></div>
+    <div class="g2">
+      <div class="card"><div class="chd"><div><h3>توزيع الحضور</h3><div class="muted">كل الجلسات منذ بداية الدورة</div></div><button class="tg" onclick="CH.toggle(this)">جدول</button></div><div id="trDonut"></div></div>
+      <div class="card"><div class="chd"><div><h3>توزيع الطلاب حسب نسبة الحضور</h3><div class="muted">كم طالبًا في كل شريحة</div></div><button class="tg" onclick="CH.toggle(this)">جدول</button></div><div id="trDist"></div></div>
+    </div>
+    <div class="card tw" style="padding:0" id="stTable"></div>
+  </section>
+  <section class="tab" id="t-sessions">
+    <div class="card"><div class="chd"><div><h3>نسبة الحضور في كل جلسة</h3><div class="muted">الجلسات المنتهية</div></div><button class="tg" onclick="CH.toggle(this)">جدول</button></div><div id="trLine"></div></div>
+    <div class="card"><div class="chd"><div><h3>عدد الطلاب في كل جلسة</h3><div class="muted">اضغط على أي عمود للتفاصيل</div></div><button class="tg" onclick="CH.toggle(this)">جدول</button></div><div id="trCols"></div></div>
+    <div class="card"><div class="chd"><div><h3>متى يصل الطلاب؟</h3><div class="muted">وقت المسح بالنسبة لبداية الجلسة</div></div><button class="tg" onclick="CH.toggle(this)">جدول</button></div><div id="trArr"></div></div>
+    <div class="card tw" style="padding:0" id="sesTable"></div>
+  </section>
+</main>
+<div id="print"></div>
+<div class="modal" id="modal"><div class="card" id="modalBody"></div></div>
+<script>/*@CH-JS*/
+/* ===================== CH — مخططات SVG خفيفة دون أي مكتبة خارجية =====================
+ * نفس الشيفرة داخل لوحة التحكم وصفحة المدرب وبطاقة الطالب.
+ * الزمن يسير من اليمين (الأقدم) إلى اليسار (الأحدث)، مثل أعمدة أوراق الدورات.
+ * كل مخطط: حركة دخول ناعمة (تُلغى إذا طلب الجهاز تقليل الحركة)، تلميح عند المرور أو اللمس
+ * أو التنقل بلوحة المفاتيح، وجدول بديل بنفس الأرقام (زر "جدول").
+ */
+var CH = (function () {
+  'use strict';
+  var NS = 'http://www.w3.org/2000/svg';
+  var RM = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var C = {
+    present: '#2E9E6E', late: '#D99A2B', excused: '#4C7FC4', absent: '#CF5148',
+    waiting: '#A3B4B8', upcoming: '#E1E8E6', none: '#E4EAE9',
+    sea: '#1F6F78', ink: '#14323F', text: '#1D2B32', mute: '#647680',
+    grid: '#E9EFEE', axis: '#C8D5D2', track: '#EDF2F1', th: '#9C3029', surface: '#FFFFFF'
+  };
+  var STATUS = [
+    { key: 'present', name: 'حاضر', color: C.present },
+    { key: 'late', name: 'متأخر', color: C.late },
+    { key: 'excused', name: 'عذر', color: C.excused },
+    { key: 'absent', name: 'غائب', color: C.absent }
+  ];
+  var CODE = { P: 0, L: 1, E: 2, A: 3 };
+
+  // ------------------------------------------------------------------ أدوات
+  function S(tag, attrs, parent) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) if (attrs[k] != null) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function H(tag, cls, parent, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  /**
+   * SVG text. anchor uses left/right meaning ('start' = text begins at x and extends right).
+   * Arabic text gets an RTL base so "الحد 75%" reads correctly; numbers like "-20" stay LTR.
+   */
+  var AR = /[\u0600-\u06FF]/;
+  function T(parent, x, y, text, cls, anchor) {
+    var rtl = AR.test(text), a = anchor || 'middle';
+    if (rtl && a != 'middle') a = a == 'start' ? 'end' : 'start';
+    var t = S('text', { x: x, y: y, 'class': cls || '', 'text-anchor': a, direction: rtl ? 'rtl' : 'ltr' }, parent);
+    t.textContent = text;
+    return t;
+  }
+  /** عدد + معدود بقواعد العربية: 1 جلسة، جلستان، 3 جلسات، 11 جلسة */
+  var WORDS = {
+    session: ['جلسة', 'جلستان', 'جلسات', 'جلسة'], student: ['طالب', 'طالبان', 'طلاب', 'طالبًا'],
+    point: ['نقطة', 'نقطتان', 'نقاط', 'نقطة'], day: ['يوم', 'يومان', 'أيام', 'يومًا'], minute: ['دقيقة', 'دقيقتان', 'دقائق', 'دقيقة']
+  };
+  function count(n, w) {
+    var f = WORDS[w] || w;
+    n = Math.round(n);
+    return n == 2 ? f[1] : n + ' ' + (n >= 3 && n <= 10 ? f[2] : n > 10 ? f[3] : f[0]);
+  }
+  function fmtN(n) { return n == null || isNaN(n) ? '—' : Number(n).toLocaleString('en-US', { maximumFractionDigits: 1 }); }
+  /** Integer percentages that always add up to 100 (largest remainder). */
+  function shares(values) {
+    var tot = values.reduce(function (a, v) { return a + (v || 0); }, 0);
+    if (!tot) return values.map(function () { return 0; });
+    var raw = values.map(function (v) { return (v || 0) * 100 / tot; }), out = raw.map(Math.floor);
+    var left = 100 - out.reduce(function (a, v) { return a + v; }, 0);
+    raw.map(function (v, i) { return { i: i, f: v - Math.floor(v) }; }).sort(function (a, b) { return b.f - a.f; })
+      .slice(0, left).forEach(function (x) { out[x.i]++; });
+    return out;
+  }
+  function niceScale(rawMax, k) {
+    rawMax = Math.max(rawMax, 1);
+    var rough = rawMax / (k || 4), p = Math.pow(10, Math.floor(Math.log(rough) / Math.LN10)), m = rough / p;
+    var step = (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * p;
+    if (step < 1) step = 1;
+    var max = Math.ceil(rawMax / step) * step, ticks = [];
+    for (var t = 0; t <= max + 1e-9; t += step) ticks.push(t);
+    return { max: max, ticks: ticks };
+  }
+  function later(fn) {
+    var done = false;
+    function go() { if (!done) { done = true; fn(); } }
+    requestAnimationFrame(function () { requestAnimationFrame(go); });
+    setTimeout(go, 700);                                  // تبويب في الخلفية: لا تبقى المخططات فارغة
+  }
+  function roundTop(x, y, w, h, r) {                       // عمود بزاويتين مدوّرتين في الأعلى فقط
+    r = Math.max(0, Math.min(r, w / 2, h));
+    return 'M' + x + ',' + (y + h) + 'V' + (y + r) + 'Q' + x + ',' + y + ' ' + (x + r) + ',' + y +
+           'H' + (x + w - r) + 'Q' + (x + w) + ',' + y + ' ' + (x + w) + ',' + (y + r) + 'V' + (y + h) + 'Z';
+  }
+
+  // ------------------------------------------------------------------ التلميح
+  var tip = null, tipOff = null;
+  function tipShow(pos, d, off) {
+    if (tipOff && tipOff !== off) tipOff();
+    tipOff = off || null;
+    if (!tip) tip = H('div', 'ch-tip', document.body);
+    tip.textContent = '';
+    if (d.title) H('div', 'ch-tip-t', tip, d.title);
+    (d.rows || []).forEach(function (r) {
+      var row = H('div', 'ch-tip-r', tip);
+      var k = H('i', 'ch-key', row);
+      k.style.background = r.color || 'transparent';
+      H('b', '', row, r.value);
+      H('span', '', row, r.label);
+    });
+    if (d.foot) H('div', 'ch-tip-f', tip, d.foot);
+    tip.classList.add('on');
+    var x = pos.clientX != null ? pos.clientX : pos.left + pos.width / 2;
+    var y = pos.clientY != null ? pos.clientY : pos.top;
+    var w = tip.offsetWidth, h = tip.offsetHeight, vw = window.innerWidth, vh = window.innerHeight;
+    var left = x - w - 14;
+    if (left < 8) left = x + 14;
+    if (left + w > vw - 8) left = Math.max(8, vw - w - 8);
+    var top = y - h - 12;
+    if (top < 8) top = y + 18;
+    if (top + h > vh - 8) top = Math.max(8, vh - h - 8);
+    tip.style.left = left + 'px';
+    tip.style.top = top + 'px';
+  }
+  function tipHide() {
+    if (tip) tip.classList.remove('on');
+    if (tipOff) { var f = tipOff; tipOff = null; f(); }
+  }
+  document.addEventListener('pointerdown', function (e) {
+    if (!(e.target && e.target.closest && e.target.closest('.ch [tabindex], .ch-hrow, .ch-seg i, .ch-strip i'))) tipHide();
+  }, true);
+  window.addEventListener('scroll', tipHide, true);
+  window.addEventListener('blur', tipHide);
+
+  /** Hover + touch + keyboard on one mark. get() -> {title, rows, foot}; hl(on) lifts the mark. */
+  function bind(el, get, hl) {
+    function off() { if (hl) hl(false); }
+    function show(e) { var d = get(e); if (!d) return; if (hl) hl(true); tipShow(e && e.clientX != null ? e : el.getBoundingClientRect(), d, off); }
+    el.addEventListener('pointermove', show);
+    el.addEventListener('pointerdown', show);
+    el.addEventListener('pointerleave', function (e) { if (e.pointerType != 'touch') tipHide(); });
+    el.setAttribute('tabindex', '0');
+    el.addEventListener('focus', function () { show(null); });
+    el.addEventListener('blur', tipHide);
+  }
+
+  // ------------------------------------------------------------------ التركيب والاستجابة للعرض
+  // mode 'w': depends on width (redrawn when the width changes; waits while hidden)
+  // mode 'v': waits while hidden so its entrance animation is seen; otherwise drawn once
+  var RO = window.ResizeObserver ? new ResizeObserver(function (list) {
+    list.forEach(function (en) {
+      var h = en.target, m = h._ch;
+      if (!h.isConnected) { RO.unobserve(h); return; }
+      if (!m || h.clientWidth < 40) return;
+      if (h._chPending || (m.mode == 'w' && Math.abs((h._chW || 0) - h.clientWidth) > 12)) mount(h, m.fn, m.opt, m.mode);
+    });
+  }) : null;
+  function mount(host, fn, opt, mode) {
+    host._ch = { fn: fn, opt: opt, mode: mode };
+    if (mode && RO && !host._chObs) { RO.observe(host); host._chObs = true; }
+    var w = host.clientWidth;
+    if (RO && ((mode == 'w' && w < 40) || (mode == 'v' && !host.getClientRects().length))) { host._chPending = true; return; }
+    host._chPending = false;
+    var anim = !RM && !host._chDone && opt.animate !== false;
+    host._chW = w;
+    host._chDone = true;
+    host.textContent = '';
+    host.classList.add('ch');
+    fn(host, opt, w, anim);
+  }
+  function legend(host, entries) {
+    var lg = H('div', 'ch-leg', host);
+    entries.forEach(function (e) {
+      var s = H('span', '', lg), i = H('i', e.kind || '', s);
+      if (e.kind != 'dash') i.style.background = e.color;
+      H('em', '', s, e.name);
+    });
+    return lg;
+  }
+  function table(host, head, rows) {
+    var t = H('table', 'ch-tbl', host), tr = H('tr', '', t);
+    head.forEach(function (h) { H('th', '', tr, h); });
+    rows.forEach(function (r) { var row = H('tr', '', t); r.forEach(function (c) { H('td', '', row, c == null ? '—' : c); }); });
+    return t;
+  }
+
+  // ------------------------------------------------------------------ الدائري (حلقة)
+  /** o: {items:[{label,value,color,note}], centerValue, centerLabel, size, unit, legend:false, hideZero} */
+  function donut(host, o, W, anim) {
+    var items = o.items, vals = items.map(function (x) { return x.value || 0; }), total = vals.reduce(function (a, v) { return a + v; }, 0);
+    var pc = shares(vals);
+    var size = o.size || 172, th = o.thickness || Math.max(12, Math.round(size * 0.125));
+    var cx = size / 2, r = (size - th) / 2 - 3, circ = 2 * Math.PI * r;
+    var wrap = H('div', 'ch-plot ch-donut' + (o.legend === false ? ' solo' : ''), host);
+    var fig = H('div', 'ch-dfig', wrap);
+    fig.style.width = fig.style.height = size + 'px';
+    var svg = S('svg', { width: size, height: size, viewBox: '0 0 ' + size + ' ' + size, role: 'img', 'aria-label': o.aria || o.centerLabel || '' }, fig);
+    var g = S('g', { transform: 'rotate(-90 ' + cx + ' ' + cx + ')' }, svg);
+    S('circle', { cx: cx, cy: cx, r: r, fill: 'none', stroke: C.track, 'stroke-width': th }, g);
+    var nz = items.filter(function (x) { return x.value > 0; }).length, gap = nz > 1 ? 2 : 0, acc = 0, arcs = [], k = 0;
+    items.forEach(function (it, i) {
+      if (!(it.value > 0)) return;
+      var len = it.value / total * circ, seg = Math.max(0.6, len - gap);
+      var a = S('circle', { cx: cx, cy: cx, r: r, fill: 'none', stroke: it.color, 'stroke-width': th,
+        'stroke-dasharray': (anim ? 0 : seg) + ' ' + circ, 'stroke-dashoffset': -acc, 'class': 'ch-arc' }, g);
+      if (anim) {
+        a.style.transition = 'stroke-dasharray .9s cubic-bezier(.22,.8,.26,1) ' + (k * 0.08) + 's, stroke-width .18s, opacity .18s';
+        later(function () { a.setAttribute('stroke-dasharray', seg + ' ' + circ); });
+      }
+      arcs[i] = a;
+      k++;
+      bind(a, function () {
+        return { title: it.label, rows: [{ color: it.color, value: fmtN(it.value) + (o.unit || ''), label: 'من ' + fmtN(total) + ' — ' + pc[i] + '%' }], foot: it.note };
+      }, function (on) { lift(i, on); });
+      acc += len;
+    });
+    function lift(i, on) {
+      svg.classList.toggle('dim', !!on);
+      arcs.forEach(function (a, j) { if (a) { a.classList.toggle('hl', on && j == i); a.style.strokeWidth = on && j == i ? (th + 6) + 'px' : ''; } });
+      if (lg) Array.prototype.forEach.call(lg.children, function (li) { li.classList.toggle('hl', on && +li.dataset.i == i); });
+    }
+    var cen = H('div', 'ch-dc', fig);
+    var b = H('b', '', cen, total ? (o.centerValue != null ? o.centerValue : fmtN(total)) : '—');
+    b.style.fontSize = Math.round(size * (String(b.textContent).length > 4 ? 0.14 : 0.17)) + 'px';
+    H('span', '', cen, total ? (o.centerLabel || '') : (o.emptyLabel || 'لا توجد بيانات بعد'));
+    var lg = null;
+    if (o.legend !== false) {
+      lg = H('div', 'ch-legend', wrap);
+      items.forEach(function (it, i) {
+        if (o.hideZero && !it.value) return;
+        var li = H('div', 'ch-li' + (it.value ? '' : ' zero'), lg);
+        li.dataset.i = i;
+        H('i', '', li).style.background = it.color;
+        H('span', '', li, it.label);
+        H('b', '', li, fmtN(it.value || 0));
+        H('em', '', li, total ? pc[i] + '%' : '');
+        if (it.value) {
+          li.addEventListener('pointerenter', function () { lift(i, true); });
+          li.addEventListener('pointerleave', function () { lift(i, false); });
+        }
+      });
+    }
+    table(host, ['الفئة', 'العدد', 'النسبة'], items.map(function (it, i) { return [it.label, fmtN(it.value || 0), total ? pc[i] + '%' : '—']; }));
+  }
+
+  // ------------------------------------------------------------------ أعمدة (مكدّسة أو مفردة)
+  /**
+   * o: {labels[], data:[{key:value}], series:[{key,name,color}], height, unit, yMax, threshold,
+   *     titles[], foot(i), colorOf(i,key), capLabels, xTitle, minBand, legend:false, tableHead}
+   */
+  function columns(host, o, W, anim) {
+    var n = o.labels.length, ser = o.series, H0 = o.height || 220;
+    var padT = o.capLabels ? 22 : 12, padB = 26 + (o.sub ? 14 : 0) + (o.xTitle ? 18 : 0), padR = 40, padL = 10;
+    var band = Math.max(o.minBand || 11, (W - padR - padL) / Math.max(n, 1));
+    var svgW = Math.max(W, Math.ceil(band * n + padR + padL)), scroll = svgW > W + 1;
+    var wrap = H('div', 'ch-plot ch-cols' + (scroll ? ' scroll' : ''), host);
+    var svg = S('svg', { width: svgW, height: H0, viewBox: '0 0 ' + svgW + ' ' + H0, role: 'img', 'aria-label': o.aria || '' }, wrap);
+    var tots = o.data.map(function (d) { return ser.reduce(function (a, s) { return a + (d[s.key] || 0); }, 0); });
+    var sc = o.yMax ? { max: o.yMax, ticks: o.ticks || [0, o.yMax / 4, o.yMax / 2, o.yMax * 3 / 4, o.yMax] } : niceScale(Math.max.apply(null, tots.concat([1])), 4);
+    var plotH = H0 - padT - padB, y0 = padT + plotH, right = svgW - padR;
+    function Y(v) { return y0 - Math.min(v, sc.max) / sc.max * plotH; }
+    function X(i) { return right - band * (i + 0.5); }
+    sc.ticks.forEach(function (t) {
+      S('line', { x1: padL, x2: right, y1: Y(t), y2: Y(t), stroke: t ? C.grid : C.axis, 'stroke-width': 1, 'shape-rendering': 'crispEdges' }, svg);
+      T(svg, right + 7, Y(t) + 4, fmtN(t) + (o.unit || ''), 'ch-tick', 'start');
+    });
+    if (o.threshold != null) {
+      S('line', { x1: padL, x2: right, y1: Y(o.threshold), y2: Y(o.threshold), stroke: C.th, 'stroke-width': 1.5, 'stroke-dasharray': '5 4', 'class': 'ch-thr' }, svg);
+    }
+    var bw = Math.min(o.barMax || 24, Math.max(3, band * 0.62)), groups = [];
+    o.data.forEach(function (d, i) {
+      var cx = X(i), x = cx - bw / 2, acc = 0, g = S('g', { 'class': 'ch-col' }, svg);
+      var keys = ser.filter(function (s) { return (d[s.key] || 0) > 0; });
+      keys.forEach(function (s, j) {
+        var v = d[s.key], top = j == keys.length - 1, yA = Y(acc), yB = Y(acc + v);
+        var h = Math.max(1, yA - yB - (top ? 0 : 2)), y = yA - h;
+        var col = o.colorOf ? o.colorOf(i, s.key) : s.color;
+        if (top) S('path', { d: roundTop(x, y, bw, h, 4), fill: col }, g);
+        else S('rect', { x: x, y: y, width: bw, height: h, fill: col }, g);
+        acc += v;
+      });
+      if (o.capLabels && tots[i] > 0 && band >= 26) T(g, cx, Y(tots[i]) - 7, fmtN(tots[i]) + (o.unit || ''), 'ch-cap');
+      if (anim) {
+        g.style.transformOrigin = cx + 'px ' + y0 + 'px';
+        g.style.transform = 'scaleY(0)';
+        g.style.transition = 'transform .7s cubic-bezier(.22,.8,.26,1) ' + Math.min(i * 0.018, 0.5) + 's, opacity .18s';
+      }
+      groups.push(g);
+      var hit = S('rect', { x: cx - band / 2, y: padT, width: band, height: plotH, fill: 'transparent', 'class': 'ch-hit' }, svg);
+      bind(hit, function () {
+        var rows = ser.map(function (s) { return { color: o.colorOf ? o.colorOf(i, s.key) : s.color, value: fmtN(d[s.key] || 0) + (ser.length == 1 ? (o.unit || '') : ''), label: s.name }; });
+        return { title: (o.titles || o.labels)[i], rows: rows, foot: o.foot ? o.foot(i) : '' };
+      }, function (on) { svg.classList.toggle('dim', !!on); g.classList.toggle('hl', !!on); });
+    });
+    if (anim) later(function () { groups.forEach(function (g) { g.style.transform = 'scaleY(1)'; }); });
+    var step = Math.max(1, Math.ceil((o.labelW || 46) / band));
+    for (var i = n - 1; i >= 0; i -= step) {
+      T(svg, X(i), y0 + 17, o.labels[i], 'ch-tick');
+      if (o.sub && o.sub[i]) T(svg, X(i), y0 + 31, o.sub[i], 'ch-sub');
+    }
+    if (o.xTitle) T(svg, padL + (right - padL) / 2, H0 - 3, o.xTitle, 'ch-axt');
+    if (scroll) later(function () { wrap.scrollLeft = -wrap.scrollWidth; });
+    var le = (ser.length > 1 && o.legend !== false ? ser.map(function (s) { return { name: s.name, color: s.color }; }) : []).concat(o.extraLegend || []);
+    if (o.threshold != null) le.push({ name: 'الحد المطلوب ' + o.threshold + (o.unit || ''), kind: 'dash' });
+    if (le.length) legend(host, le);
+    table(host, o.tableHead || ['البند'].concat(ser.map(function (s) { return s.name; })),
+      o.data.map(function (d, i) { return [(o.titles || o.labels)[i]].concat(ser.map(function (s) { return fmtN(d[s.key] || 0) + (ser.length == 1 ? (o.unit || '') : ''); })); }));
+  }
+
+  // ------------------------------------------------------------------ خط زمني مع مساحة خفيفة
+  /** o: {labels[], values[] (null = لا بيانات), titles[], height, yMax, unit, threshold, color, tipRows(i), foot(i), name} */
+  function line(host, o, W, anim) {
+    var v = o.values, n = v.length, H0 = o.height || 210, col = o.color || C.sea;
+    var padT = 16, padB = 26, padR = 40, padL = 46, right = W - padR;
+    var sc = o.yMax ? { max: o.yMax, ticks: [0, o.yMax / 4, o.yMax / 2, o.yMax * 3 / 4, o.yMax] } : niceScale(Math.max.apply(null, v.filter(function (x) { return x != null; }).concat([1])), 4);
+    var plotH = H0 - padT - padB, y0 = padT + plotH, step = n > 1 ? (right - padL) / (n - 1) : 0;
+    function X(i) { return n > 1 ? right - i * step : (right + padL) / 2; }
+    function Y(x) { return y0 - Math.min(x, sc.max) / sc.max * plotH; }
+    var wrap = H('div', 'ch-plot ch-line', host);
+    var svg = S('svg', { width: W, height: H0, viewBox: '0 0 ' + W + ' ' + H0, role: 'img', 'aria-label': o.aria || '' }, wrap);
+    sc.ticks.forEach(function (t) {
+      S('line', { x1: padL - 6, x2: right, y1: Y(t), y2: Y(t), stroke: t ? C.grid : C.axis, 'stroke-width': 1, 'shape-rendering': 'crispEdges' }, svg);
+      T(svg, right + 7, Y(t) + 4, fmtN(t) + (o.unit || ''), 'ch-tick', 'start');
+    });
+    var segs = [], cur = null;
+    v.forEach(function (x, i) { if (x == null) cur = null; else { if (!cur) segs.push(cur = []); cur.push(i); } });
+    var gArea = S('g', { 'class': 'ch-area' }, svg), gLine = S('g', {}, svg), paths = [];
+    segs.forEach(function (sg) {
+      var d = sg.map(function (i, j) { return (j ? 'L' : 'M') + X(i).toFixed(1) + ',' + Y(v[i]).toFixed(1); }).join('');
+      if (sg.length > 1) {
+        S('path', { d: d + 'L' + X(sg[sg.length - 1]).toFixed(1) + ',' + y0 + 'L' + X(sg[0]).toFixed(1) + ',' + y0 + 'Z', fill: col, 'fill-opacity': 0.1 }, gArea);
+        paths.push(S('path', { d: d, fill: 'none', stroke: col, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, gLine));
+      }
+    });
+    if (o.threshold != null) {
+      S('line', { x1: padL - 6, x2: right, y1: Y(o.threshold), y2: Y(o.threshold), stroke: C.th, 'stroke-width': 1.5, 'stroke-dasharray': '5 4', 'class': 'ch-thr' }, svg);
+    }
+    var pts = S('g', {}, svg), dots = n <= 24;
+    v.forEach(function (x, i) {
+      if (x == null) return;
+      var isolated = (i == 0 || v[i - 1] == null) && (i == n - 1 || v[i + 1] == null);
+      if (dots || isolated) S('circle', { cx: X(i), cy: Y(x), r: 4, fill: col, stroke: C.surface, 'stroke-width': 2 }, pts);
+    });
+    var last = -1;
+    for (var i = n - 1; i >= 0; i--) if (v[i] != null) { last = i; break; }
+    if (last >= 0) {
+      if (!dots) S('circle', { cx: X(last), cy: Y(v[last]), r: 4.5, fill: col, stroke: C.surface, 'stroke-width': 2 }, pts);
+      T(svg, X(last) - 9, Y(v[last]) + 4, fmtN(v[last]) + (o.unit || ''), 'ch-end', 'end');
+    }
+    var stp = n > 1 ? Math.max(1, Math.ceil((o.labelW || 52) / step)) : 1;
+    for (var j = n - 1; j >= 0; j -= stp) T(svg, X(j), y0 + 17, o.labels[j], 'ch-tick');
+    // المؤشر العمودي: يلتقط أقرب نقطة، لا حاجة لإصابة الخط نفسه
+    var cross = S('line', { x1: 0, x2: 0, y1: padT, y2: y0, stroke: C.axis, 'stroke-width': 1, 'class': 'ch-cross' }, svg);
+    var hdot = S('circle', { r: 5, fill: col, stroke: C.surface, 'stroke-width': 2, 'class': 'ch-cross' }, svg);
+    var hit = S('rect', { x: padL - 10, y: padT, width: right - padL + 20, height: plotH, fill: 'transparent', 'class': 'ch-hit' }, svg);
+    var at = last;
+    function idx(e) {
+      if (!e) return at;
+      var b = svg.getBoundingClientRect(), px = (e.clientX - b.left) * (W / b.width);
+      var k = n > 1 ? Math.round((right - px) / step) : 0;
+      return Math.max(0, Math.min(n - 1, k));
+    }
+    bind(hit, function (e) {
+      var i = idx(e);
+      at = i;
+      cross.setAttribute('x1', X(i)); cross.setAttribute('x2', X(i));
+      if (v[i] != null) { hdot.setAttribute('cx', X(i)); hdot.setAttribute('cy', Y(v[i])); hdot.style.display = ''; } else hdot.style.display = 'none';
+      var rows = [{ color: col, value: v[i] == null ? '—' : fmtN(v[i]) + (o.unit || ''), label: o.name || '' }].concat(o.tipRows ? o.tipRows(i) : []);
+      return { title: (o.titles || o.labels)[i], rows: rows, foot: o.foot ? o.foot(i) : '' };
+    }, function (on) { svg.classList.toggle('xon', !!on); });
+    hit.addEventListener('keydown', function (e) {
+      if (e.key != 'ArrowLeft' && e.key != 'ArrowRight') return;
+      e.preventDefault();
+      at = Math.max(0, Math.min(n - 1, at + (e.key == 'ArrowLeft' ? 1 : -1)));
+      hit.dispatchEvent(new FocusEvent('focus'));
+    });
+    if (anim) {
+      paths.forEach(function (p) {
+        var L = p.getTotalLength();
+        p.style.strokeDasharray = L + ' ' + L;
+        p.style.strokeDashoffset = L;
+        p.style.transition = 'stroke-dashoffset 1.1s cubic-bezier(.4,.1,.2,1)';
+      });
+      gArea.style.opacity = 0; gArea.style.transition = 'opacity .8s ease .45s';
+      pts.style.opacity = 0; pts.style.transition = 'opacity .4s ease .8s';
+      later(function () {
+        paths.forEach(function (p) { p.style.strokeDashoffset = 0; });
+        gArea.style.opacity = 1; pts.style.opacity = 1;
+      });
+    }
+    if (o.threshold != null) legend(host, [{ name: o.name || 'القيمة', color: col, kind: 'ln' }, { name: 'الحد المطلوب ' + o.threshold + (o.unit || ''), kind: 'dash' }]);
+    table(host, o.tableHead || ['التاريخ', o.name || 'القيمة'], v.map(function (x, i) { return [(o.titles || o.labels)[i], x == null ? '—' : fmtN(x) + (o.unit || '')]; }));
+  }
+
+  // ------------------------------------------------------------------ أشرطة أفقية مرتبة
+  /** o: {items:[{label,sub,value,color,tip}], max, unit, threshold, onClick(i)} */
+  function hbars(host, o, W, anim) {
+    var max = o.max || Math.max.apply(null, o.items.map(function (x) { return x.value || 0; }).concat([1]));
+    var wrap = H('div', 'ch-plot ch-hbars', host), bars = [];
+    o.items.forEach(function (it, i) {
+      var row = H('div', 'ch-hrow' + (o.onClick ? ' click' : ''), wrap);
+      var lab = H('div', 'ch-hl', row);
+      H('span', '', lab, it.label);
+      if (it.sub) H('small', '', lab, it.sub);
+      var tr = H('div', 'ch-htrack', row), bar = H('i', '', tr);
+      bar.style.background = it.color || C.sea;
+      var w = it.value == null ? 0 : Math.max(0, Math.min(100, it.value / max * 100));
+      bar.style.width = (anim ? 0 : w) + '%';
+      if (anim) { bar.style.transition = 'width .8s cubic-bezier(.22,.8,.26,1) ' + Math.min(i * 0.05, 0.6) + 's'; bars.push([bar, w]); }
+      if (o.threshold != null) H('b', 'ch-hth', tr).style.right = (o.threshold / max * 100) + '%';   // الصفحة من اليمين لليسار
+      H('div', 'ch-hv', row, it.value == null ? '—' : fmtN(it.value) + (o.unit || ''));
+      bind(row, function () {
+        return { title: it.label, rows: [{ color: it.color || C.sea, value: it.value == null ? '—' : fmtN(it.value) + (o.unit || ''), label: o.name || '' }].concat(it.tip || []), foot: it.foot };
+      }, function (on) { row.classList.toggle('hl', !!on); });
+      if (o.onClick) row.addEventListener('click', function () { tipHide(); o.onClick(i); });
+    });
+    if (!o.items.length) H('div', 'ch-empty', wrap, o.empty || 'لا توجد بيانات بعد');
+    if (o.items.length && (o.threshold != null || o.extraLegend)) legend(host, (o.extraLegend || []).concat(o.threshold != null ? [{ name: 'الحد المطلوب ' + o.threshold + (o.unit || ''), kind: 'dash' }] : []));
+    if (anim) later(function () { bars.forEach(function (b) { b[0].style.width = b[1] + '%'; }); });
+    table(host, [o.labelHead || 'البند', o.name || 'القيمة'], o.items.map(function (it) { return [it.label, it.value == null ? '—' : fmtN(it.value) + (o.unit || '')]; }));
+  }
+
+  // ------------------------------------------------------------------ شريط مقسّم رفيع (جزء من كل)
+  /** o: {items:[{label,value,color}], total (اختياري: الباقي يظهر كمسار فارغ), height} */
+  function segbar(host, o, W, anim) {
+    var sum = o.items.reduce(function (a, x) { return a + (x.value || 0); }, 0), total = Math.max(o.total || 0, sum);
+    var bar = H('div', 'ch-seg' + (anim ? ' grow' : ''), host);
+    bar.style.height = (o.height || 8) + 'px';
+    bar.setAttribute('role', 'img');
+    bar.setAttribute('aria-label', o.items.map(function (x) { return x.label + ' ' + (x.value || 0); }).join('، '));
+    var pc = shares(o.items.map(function (x) { return x.value || 0; }).concat([total - sum]));
+    o.items.forEach(function (it, i) {
+      if (!(it.value > 0)) return;
+      var s = H('i', '', bar);
+      s.style.flexGrow = it.value;
+      s.style.background = it.color;
+      bind(s, function () { return { rows: [{ color: it.color, value: fmtN(it.value), label: it.label + ' — ' + pc[i] + '%' }] }; },
+        function (on) { s.classList.toggle('hl', !!on); });
+    });
+    if (total > sum) { var rest = H('i', 'rest', bar); rest.style.flexGrow = total - sum; }
+    if (anim) later(function () { bar.classList.remove('grow'); });
+  }
+
+  // ------------------------------------------------------------------ شريط الجلسات (مربع لكل جلسة)
+  /** o: {seq:'PLA-E', titles[], size, legend:true, last:N} */
+  function strip(host, o, W, anim) {
+    var seq = o.seq || '', start = o.last ? Math.max(0, seq.length - o.last) : 0;
+    var box = H('div', 'ch-strip' + (o.small ? ' small' : ''), host);
+    var cells = [];
+    for (var i = start; i < seq.length; i++) (function (i) {
+      var ch = seq.charAt(i), st = STATUS[CODE[ch]];
+      if (o.skipBlank && !st) return;
+      var c = H('i', st ? '' : 'none', box);
+      if (st) c.style.background = st.color;
+      if (anim) { c.style.opacity = 0; c.style.transition = 'opacity .3s ease ' + Math.min((i - start) * 0.012, 0.6) + 's'; cells.push(c); }
+      if (!o.small) bind(c, function () {
+        return { title: o.titles ? o.titles[i] : '', rows: [{ color: st ? st.color : C.none, value: st ? st.name : 'لا تُحتسب', label: '' }] };
+      }, function (on) { c.classList.toggle('hl', !!on); });
+    })(i);
+    if (anim) later(function () { cells.forEach(function (c) { c.style.opacity = 1; }); });
+    if (o.legend !== false && !o.small) legend(host, STATUS.map(function (s) { return { name: s.name, color: s.color }; }).concat(o.blankLegend ? [{ name: o.blankLegend, color: C.none }] : []));
+  }
+
+  // ------------------------------------------------------------------ خط مصغّر داخل بطاقة الأرقام
+  function spark(host, o) {
+    var v = (o.values || []).filter(function (x) { return x != null; }), w = o.width || 104, h = o.height || 30, col = o.color || C.sea;
+    host.textContent = '';
+    host.classList.add('ch-spark');
+    if (v.length < 2) return;
+    var mx = Math.max.apply(null, v), mn = Math.min.apply(null, v), span = Math.max(1, mx - mn);
+    var svg = S('svg', { width: w, height: h, viewBox: '0 0 ' + w + ' ' + h, 'aria-hidden': 'true' }, host);
+    function X(i) { return w - 5 - i * (w - 10) / (v.length - 1); }
+    function Y(x) { return h - 5 - (x - mn) / span * (h - 10); }
+    var d = v.map(function (x, i) { return (i ? 'L' : 'M') + X(i).toFixed(1) + ',' + Y(x).toFixed(1); }).join('');
+    S('path', { d: d + 'L' + X(v.length - 1) + ',' + h + 'L' + X(0) + ',' + h + 'Z', fill: col, 'fill-opacity': 0.1 }, svg);
+    S('path', { d: d, fill: 'none', stroke: col, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, svg);
+    S('circle', { cx: X(v.length - 1), cy: Y(v[v.length - 1]), r: 3.5, fill: col, stroke: C.surface, 'stroke-width': 1.5 }, svg);
+  }
+
+  /** زر "جدول/مخطط" في رأس البطاقة: يبدّل كل مخططات البطاقة إلى جداولها. */
+  function toggle(btn) {
+    var card = btn.closest('.card') || btn.parentNode;
+    var on = card.classList.toggle('tbl-on');
+    btn.textContent = on ? 'مخطط' : 'جدول';
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  }
+
+  return {
+    C: C, STATUS: STATUS, shares: shares, fmt: fmtN, count: count, toggle: toggle, hide: tipHide,
+    donut: function (h, o) { mount(h, donut, o, 'v'); },
+    columns: function (h, o) { mount(h, columns, o, 'w'); },
+    line: function (h, o) { mount(h, line, o, 'w'); },
+    hbars: function (h, o) { mount(h, hbars, o, 'v'); },
+    segbar: function (h, o) { mount(h, segbar, o); },
+    strip: function (h, o) { mount(h, strip, o); },
+    spark: spark,
+    /** نص أعمدة توقيت الوصول، من حدود الفئات القادمة من الخادم */
+    arrivalLabel: function (b) { return b.lo == null ? 'أبكر' : b.lo > 0 ? '+' + b.lo : String(b.lo); },
+    arrivalTitle: function (b) {
+      if (b.lo == null) return 'أكثر من ' + (-b.hi) + ' دقيقة قبل البداية';
+      if (b.hi == null) return b.lo + ' دقيقة أو أكثر بعد البداية';
+      function u(n) { return n >= 3 && n <= 10 ? ' دقائق' : ' دقيقة'; }   // الرقم مذكور قبلها دائمًا
+      if (b.hi <= 0) return b.hi == 0 ? 'في آخر ' + (-b.lo) + u(-b.lo) + ' قبل البداية' : 'قبل البداية بـ ' + (-b.hi) + ' إلى ' + (-b.lo) + u(-b.lo);
+      return b.lo == 0 ? 'في أول ' + b.hi + u(b.hi) + ' بعد البداية' : 'بعد البداية بـ ' + b.lo + ' إلى ' + b.hi + u(b.hi);
+    }
+  };
+})();
+
+/* ---------- مخططات التقارير الجاهزة (مشتركة بين لوحة التحكم وصفحة المدرب) ---------- */
+CH.v = (function () {
+  var C = CH.C, ST = CH.STATUS;
+  function dm(key) { var p = String(key).split('-'); return p.length == 3 ? (+p[2]) + '/' + (+p[1]) : key; }
+  function slotTitle(s) { return s.day + ' ' + s.date + ' — ' + (s.n == 'X' ? 'خارج الجدول' : 'الجلسة ' + s.n + ' (' + s.label + ')'); }
+  function rate(x) { var d = x.present + x.late + x.absent; return d ? Math.round((x.present + x.late) * 100 / d) : null; }
+  function statusItems(x, absentLabel) {
+    return ST.map(function (s) { return { label: s.key == 'absent' && absentLabel ? absentLabel : s.name, value: x[s.key] || 0, color: s.color }; });
+  }
+  return {
+    dm: dm, rate: rate, slotTitle: slotTitle,
+    /** حلقة توزيع الحالات؛ المركز = نسبة الحضور */
+    donut: function (host, x, o) {
+      o = o || {};
+      var r = rate(x);
+      CH.donut(host, { items: statusItems(x), size: o.size || 176, legend: o.legend, animate: o.animate,
+        centerValue: r == null ? '—' : r + '%', centerLabel: o.centerLabel || 'نسبة الحضور', emptyLabel: o.empty || 'لا توجد جلسات بعد' });
+    },
+    /** نسبة الحضور في كل جلسة منتهية */
+    sessionRate: function (host, r, o) {
+      var sl = r.slots.filter(function (s) { return s.ended; });
+      if (!sl.length) { host.innerHTML = '<div class="ch-empty">تظهر النسب بعد انتهاء أول جلسة</div>'; return; }
+      CH.line(host, { labels: sl.map(function (s) { return dm(s.date); }), titles: sl.map(slotTitle), values: sl.map(rate),
+        yMax: 100, unit: '%', threshold: r.threshold, name: 'نسبة الحضور', height: (o && o.height) || 210, animate: o && o.animate,
+        tipRows: function (i) { var s = sl[i]; return ST.map(function (t) { return { color: t.color, value: CH.fmt(s[t.key]), label: t.name }; }); },
+        tableHead: ['الجلسة', 'نسبة الحضور'] });
+    },
+    /** عدد الطلاب في كل جلسة، مكدّس حسب الحالة */
+    sessionCols: function (host, r, o) {
+      if (!r.slots.length) { host.innerHTML = '<div class="ch-empty">لا جلسات بعد</div>'; return; }
+      var multi = r.course && r.course.sessions && r.course.sessions.length > 1;
+      CH.columns(host, { labels: r.slots.map(function (s) { return dm(s.date); }), titles: r.slots.map(slotTitle),
+        sub: multi ? r.slots.map(function (s) { return s.n == 'X' ? '—' : 'ج' + s.n; }) : null,
+        data: r.slots, series: ST, height: (o && o.height) || 230, animate: o && o.animate, minBand: 12,
+        foot: function (i) { var s = r.slots[i], p = rate(s); return (s.ended ? '' : 'جلسة جارية — ') + (p == null ? '' : 'نسبة الحضور ' + p + '%'); },
+        tableHead: ['الجلسة'].concat(ST.map(function (s) { return s.name; })) });
+    },
+    /** توزيع الطلاب على شرائح النسبة: تحت الحد / حوله / فوقه */
+    distribution: function (host, r, o) {
+      var bins = [];
+      for (var b = 0; b < 10; b++) bins.push({ lo: b * 10, hi: b == 9 ? 100 : b * 10 + 9, n: 0, names: [] });
+      r.rows.forEach(function (x) {
+        if (x.pct == null || x.status != 'مقبول') return;
+        var k = Math.min(9, Math.floor(x.pct / 10));
+        bins[k].n++; bins[k].names.push(x.name);
+      });
+      var th = r.threshold;
+      function cls(bn) { return bn.hi < th ? 'absent' : bn.lo < th ? 'late' : 'present'; }
+      var names = { absent: 'تحت الحد', late: 'حول الحد', present: 'فوق الحد' };
+      host.textContent = '';
+      var plot = document.createElement('div');
+      host.appendChild(plot);
+      CH.columns(plot, { labels: bins.map(function (bn) { return bn.lo + '%'; }), titles: bins.map(function (bn) { return 'من ' + bn.lo + '% إلى ' + bn.hi + '%'; }),
+        data: bins.map(function (bn) { return { v: bn.n }; }), series: [{ key: 'v', name: 'عدد الطلاب', color: C.present }],
+        colorOf: function (i) { return C[cls(bins[i])]; }, capLabels: true, height: (o && o.height) || 210, animate: o && o.animate, labelW: 30,
+        xTitle: 'نسبة حضور الطالب', legend: false,
+        foot: function (i) { var bn = bins[i]; return names[cls(bn)] + (bn.names.length ? ' — ' + bn.names.slice(0, 6).join('، ') + (bn.names.length > 6 ? '…' : '') : ''); },
+        tableHead: ['الشريحة', 'عدد الطلاب'] });
+      var lg = document.createElement('div');
+      lg.className = 'ch-leg';
+      ['absent', 'late', 'present'].forEach(function (k) {
+        var s = document.createElement('span'), i = document.createElement('i'), e = document.createElement('em');
+        i.style.background = C[k]; e.textContent = names[k] + (k == 'late' ? ' (' + th + '%)' : '');
+        s.appendChild(i); s.appendChild(e); lg.appendChild(s);
+      });
+      host.appendChild(lg);
+    },
+    /** متى يصل الطلاب؟ فئات 5 دقائق حول بداية الجلسة */
+    arrivals: function (host, bins, o) {
+      var tot = bins.reduce(function (a, b) { return a + b.ok + b.late; }, 0);
+      if (!tot) { host.innerHTML = '<div class="ch-empty">يظهر بعد أول عمليات مسح</div>'; return; }
+      CH.columns(host, { labels: bins.map(CH.arrivalLabel), titles: bins.map(CH.arrivalTitle), data: bins,
+        series: [{ key: 'ok', name: 'في الموعد', color: C.present }, { key: 'late', name: 'متأخر', color: C.late }],
+        height: (o && o.height) || 210, animate: o && o.animate, labelW: 22, xTitle: 'الدقائق بالنسبة لبداية الجلسة (0 = البداية)',
+        foot: function (i) { var b = bins[i], n = b.ok + b.late; return n ? Math.round(n * 100 / tot) + '% من كل عمليات الوصول' : ''; },
+        tableHead: ['التوقيت', 'في الموعد', 'متأخر'] });
+    },
+    /** شريط كل جلسات طالب واحد + تطور نسبته */
+    studentStrip: function (host, x, r, o) {
+      CH.strip(host, { seq: x.seq || '', titles: r.slots.map(slotTitle), last: o && o.last, small: o && o.small, blankLegend: 'لا تُحتسب (جارية أو قبل تسجيله)', animate: o && o.animate });
+    },
+    studentTrend: function (host, x, r) {
+      var p = 0, l = 0, a = 0, labels = [], titles = [], vals = [];
+      (x.seq || '').split('').forEach(function (c, i) {
+        if (c == '-') return;
+        if (c == 'P') p++; else if (c == 'L') l++; else if (c == 'A') a++;
+        labels.push(dm(r.slots[i].date)); titles.push(slotTitle(r.slots[i]));
+        vals.push(p + l + a ? Math.round((p + l) * 100 / (p + l + a)) : null);
+      });
+      if (!vals.length) { host.innerHTML = '<div class="ch-empty">لا جلسات محتسبة بعد</div>'; return; }
+      CH.line(host, { labels: labels, titles: titles, values: vals, yMax: 100, unit: '%', threshold: r.threshold, name: 'النسبة التراكمية', height: 170 });
+    }
+  };
+})();
+/*@CH-JS-END*/</script>
+<script>
+var P = {};
+(location.hash || '').slice(1).split('&').forEach(function (kv) { var i = kv.indexOf('='); if (i > 0) P[kv.slice(0, i)] = decodeURIComponent(kv.slice(i + 1)); });
+var D = null, timer = null;
+function $(id) { return document.getElementById(id); }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function chip(r) {
+  if (!r) return '<span class="muted">—</span>';
+  var c = /حاضر|يدوي/.test(r) ? 'c-ok' : r == 'متأخر' ? 'c-late' : r == 'عذر' ? 'c-exc' : r == 'غائب' ? 'c-bad' : 'c-mute';
+  return '<span class="chip ' + c + '">' + esc(r) + '</span>';
+}
+document.querySelectorAll('nav button').forEach(function (b) {
+  b.onclick = function () {
+    CH.hide();
+    document.querySelectorAll('nav button').forEach(function (x) { x.classList.toggle('on', x == b); });
+    document.querySelectorAll('.tab').forEach(function (t) { t.classList.toggle('on', t.id == 't-' + b.dataset.t); });
+  };
+});
+$('modal').addEventListener('click', function (e) { if (e.target.id == 'modal') closeModal(); });
+function closeModal() { $('modal').classList.remove('on'); CH.hide(); }
+function load(quiet) {
+  if (!P.k || !P.api) { $('dayBody').innerHTML = '<div class="empty">الرابط غير مكتمل</div>'; return Promise.resolve(); }
+  var d = $('date').value;
+  return fetch(P.api + '?action=view&k=' + encodeURIComponent(P.k) + (d ? '&date=' + d : '')).then(function (r) { return r.json(); }).then(function (j) {
+    if (!j.ok) { $('dayBody').innerHTML = '<div class="empty">هذا الرابط لم يعد مفعّلًا. تواصل مع الإدارة.</div>'; return; }
+    D = j; render(!quiet);
+  }).catch(function () { if (!quiet) $('dayBody').innerHTML = '<div class="empty">تعذّر الاتصال. تحقق من الإنترنت.</div>'; });
+}
+function daySum(s) {
+  var rows = s.rows.filter(function (x) { return x.result != 'لم يكن مسجّلًا'; });
+  var c = function (re) { return rows.filter(function (x) { return re.test(x.result); }).length; };
+  return { rows: rows, present: c(/^(حاضر|حضور يدوي)$/), late: c(/^متأخر$/), excused: c(/^عذر$/), absent: c(/^غائب$/) };
+}
+function render(anim) {
+  var r = D.report, c = r.course, t = r.totals;
+  $('title').textContent = c.name; document.title = 'حضور ' + c.name;
+  $('sub').textContent = D.center + (c.trainer ? ' — ' + c.trainer : '') + ' — ' + c.daysText + ' — ' + c.sessions.join('، ');
+  $('upd').textContent = 'آخر تحديث ' + D.updated;
+  if (!$('date').value) $('date').value = D.day.date;
+  var day = D.day, sums = [];
+  $('dayBody').innerHTML = day.sessions.length ? day.sessions.map(function (s, i) {
+    var m = daySum(s); sums.push(m);
+    var here = m.present + m.late;
+    return '<div class="card"><h3>' + esc(day.dayName + ' ' + day.date) + ' — ' + (s.n == 'X' ? 'خارج الجدول' : 'الجلسة ' + esc(s.n) + ' (' + esc(s.label) + ')') + ' ' +
+      chip(s.future ? 'قادمة' : s.ended ? 'انتهت' : 'جارية') + '</h3><div class="dbar" data-i="' + i + '"></div><div class="att-sum">' +
+      CH.STATUS.map(function (x) { return '<span><i style="background:' + x.color + '"></i>' + x.name + ' <b>' + m[x.key] + '</b></span>'; }).join('') +
+      '<span>حضر ' + here + ' من ' + m.rows.length + '</span></div><table><tr><th>الطالب</th><th>الحالة</th><th>الوقت</th></tr>' +
+      m.rows.map(function (x) { return '<tr><td>' + esc(x.name) + '</td><td>' + chip(x.result) + '</td><td>' + esc(x.time) + '</td></tr>'; }).join('') + '</table></div>';
+  }).join('') : '<div class="card empty">لا توجد جلسات يوم ' + esc(day.dayName + ' ' + day.date) + '</div>';
+  document.querySelectorAll('#dayBody .dbar').forEach(function (el) {
+    var m = sums[+el.dataset.i];
+    CH.segbar(el, { height: 10, total: m.rows.length, animate: anim, items: CH.STATUS.map(function (x) { return { label: x.name, value: m[x.key], color: x.color }; }) });
+  });
+  var lateShare = t.present + t.late ? Math.round(t.late * 100 / (t.present + t.late)) : null;
+  $('kpis').innerHTML = [[r.avg == null ? '—' : r.avg + '%', 'متوسط نسب الطلاب'], [r.below, 'تحت ' + r.threshold + '%'], [r.endedSessions + '<small> / ' + r.totalSessions + '</small>', 'جلسات انتهت'],
+    [r.rows.length, 'طالب'], [lateShare == null ? '—' : lateShare + '%', 'من الحضور متأخرون']]
+    .map(function (k) { return '<div class="kpi"><b>' + k[0] + '</b><span>' + k[1] + '</span></div>'; }).join('');
+  CH.v.donut($('trDonut'), t, { size: 172, animate: anim });
+  CH.v.distribution($('trDist'), r, { animate: anim });
+  $('stTable').innerHTML = '<table><tr><th>الطالب</th><th>حضور</th><th>تأخير</th><th>عذر</th><th>غياب</th><th class="wide-only">آخر الجلسات</th><th style="width:180px">النسبة</th></tr>' + r.rows.map(function (x, i) {
+    var low = x.pct != null && x.pct < r.threshold;
+    return '<tr class="st" data-i="' + i + '"><td>' + esc(x.name) + '</td><td>' + x.present + '</td><td>' + x.late + '</td><td>' + x.excused + '</td><td>' + x.absent +
+      '</td><td class="wide-only"><div class="ms" data-i="' + i + '"></div></td><td><div class="row" style="flex-wrap:nowrap"><div class="bar"><i style="width:' + (x.pct || 0) + '%;' + (low ? 'background:#CF5148' : '') + '"></i></div><span class="' + (low ? 'low' : '') + '">' + (x.pct == null ? '—' : x.pct + '%') + '</span></div></td></tr>';
+  }).join('') + '</table>';
+  document.querySelectorAll('#stTable .ms').forEach(function (el) { CH.v.studentStrip(el, r.rows[+el.dataset.i], r, { last: 14, small: true, animate: false }); });
+  document.querySelectorAll('#stTable tr.st').forEach(function (tr) { tr.onclick = function () { studentDetail(r.rows[+tr.dataset.i]); }; });
+  CH.v.sessionRate($('trLine'), r, { animate: anim });
+  CH.v.sessionCols($('trCols'), r, { animate: anim });
+  CH.v.arrivals($('trArr'), r.arrivals, { animate: anim });
+  $('sesTable').innerHTML = r.slots.length ? '<table><tr><th>التاريخ</th><th>الجلسة</th><th>حاضر</th><th>متأخر</th><th>عذر</th><th>غائب</th><th>النسبة</th></tr>' + r.slots.slice().reverse().map(function (s) {
+    var p = CH.v.rate(s);
+    return '<tr><td>' + esc(s.day + ' ' + s.date) + '</td><td>' + (s.n == 'X' ? 'خارج الجدول' : 'ج' + esc(s.n) + ' ' + esc(s.label)) + '</td><td>' + s.present + '</td><td>' + s.late + '</td><td>' + s.excused + '</td><td>' + s.absent +
+      (s.ended ? '' : ' <span class="muted">(جارية)</span>') + '</td><td>' + (p == null ? '—' : p + '%') + '</td></tr>';
+  }).join('') + '</table>' : '<div class="empty">لا جلسات بعد</div>';
+  if (document.body.classList.contains('printing')) buildPrint();
+}
+function studentDetail(x) {
+  var r = D.report;
+  $('modalBody').innerHTML = '<div class="chd"><div><h3>' + esc(x.name) + '</h3><div class="muted">' + esc(r.course.name) + '</div></div><button class="b" onclick="closeModal()">إغلاق</button></div>' +
+    '<div id="sdDonut"></div><h4>كل الجلسات</h4><div id="sdStrip"></div><h4>تطور نسبة الحضور</h4><div id="sdTrend"></div>';
+  $('modal').classList.add('on');
+  CH.donut($('sdDonut'), { size: 150, items: CH.STATUS.map(function (s) { return { label: s.name, value: x[s.key], color: s.color }; }),
+    centerValue: x.pct == null ? '—' : x.pct + '%', centerLabel: 'نسبة الحضور', emptyLabel: 'لا جلسات محتسبة', unit: ' جلسة' });
+  CH.v.studentStrip($('sdStrip'), x, r);
+  CH.v.studentTrend($('sdTrend'), x, r);
+}
+function buildPrint() {
+  var r = D.report, c = r.course, t = r.totals;
+  $('print').innerHTML = '<div class="tools row"><button class="b p" onclick="window.print()">طباعة / حفظ PDF</button><button class="b" onclick="document.body.classList.remove(\'printing\')">رجوع</button>' +
+    '<span class="muted">في نافذة الطباعة اختر "حفظ بتنسيق PDF"</span></div>' +
+    '<h1>تقرير الحضور — ' + esc(c.name) + '</h1><div class="meta">' + esc(D.center) + (c.trainer ? ' — المدرب: ' + esc(c.trainer) : '') + '<br>المدة: ' + esc(c.start) + (c.end ? ' إلى ' + esc(c.end) : '') +
+    ' — ' + esc(c.daysText) + ' — ' + esc(c.sessions.join('، ')) + '<br>تاريخ التقرير: ' + esc(D.updated) + '</div>' +
+    '<div class="pk">' + [[r.avg == null ? '—' : r.avg + '%', 'متوسط نسب الطلاب'], [r.below, 'طالب تحت ' + r.threshold + '%'], [r.endedSessions + ' / ' + r.totalSessions, 'جلسات انتهت'], [r.rows.length, 'طالب']]
+      .map(function (k) { return '<div><b>' + k[0] + '</b><span>' + k[1] + '</span></div>'; }).join('') + '</div>' +
+    '<div class="pgrid"><div class="pcard"><h3>توزيع الحضور</h3><div id="pDonut"></div></div><div class="pcard"><h3>نسبة الحضور في كل جلسة</h3><div id="pLine"></div></div></div>' +
+    '<div class="pcard"><h3>عدد الطلاب في كل جلسة</h3><div id="pCols"></div></div>' +
+    '<h3>الطلاب</h3><table><tr><th>#</th><th>الطالب</th><th>حضور</th><th>تأخير</th><th>عذر</th><th>غياب</th><th>آخر الجلسات</th><th>النسبة</th></tr>' + r.rows.slice().sort(function (a, b) { return a.name.localeCompare(b.name, 'ar'); }).map(function (x, i) {
+      var low = x.pct != null && x.pct < r.threshold;
+      return '<tr><td>' + (i + 1) + '</td><td>' + esc(x.name) + (x.status != 'مقبول' ? ' (' + esc(x.status) + ')' : '') + '</td><td>' + x.present + '</td><td>' + x.late + '</td><td>' + x.excused + '</td><td>' + x.absent +
+        '</td><td><div class="pms" data-id="' + esc(x.id) + '"></div></td><td class="' + (low ? 'low' : '') + '">' + (x.pct == null ? '—' : x.pct + '%') + '</td></tr>';
+    }).join('') + '</table>' +
+    '<h3>الجلسات</h3><table><tr><th>التاريخ</th><th>الجلسة</th><th>حاضر</th><th>متأخر</th><th>عذر</th><th>غائب</th><th>النسبة</th></tr>' + r.slots.map(function (s) {
+      var p = CH.v.rate(s);
+      return '<tr><td>' + esc(s.day + ' ' + s.date) + '</td><td>' + (s.n == 'X' ? 'خارج الجدول' : 'ج' + esc(s.n) + ' ' + esc(s.label)) + '</td><td>' + s.present + '</td><td>' + s.late + '</td><td>' + s.excused + '</td><td>' + s.absent + '</td><td>' + (p == null ? '—' : p + '%') + '</td></tr>';
+    }).join('') + '</table>';
+  CH.v.donut($('pDonut'), t, { size: 150, animate: false });
+  CH.v.sessionRate($('pLine'), r, { animate: false, height: 190 });
+  CH.v.sessionCols($('pCols'), r, { animate: false, height: 200 });
+  document.querySelectorAll('#print .pms').forEach(function (el) {
+    var x = r.rows.filter(function (y) { return y.id == el.dataset.id; })[0];
+    CH.v.studentStrip(el, x, r, { last: 14, small: true, animate: false });
+  });
+}
+function printMode() { document.body.classList.add('printing'); if (D) buildPrint(); }
+if (P.print) document.body.classList.add('printing');
+load().then(function () { timer = setInterval(function () { if (!document.body.classList.contains('printing') && !$('modal').classList.contains('on')) load(true); }, 30000); });
+</script>
+</body>
+</html>

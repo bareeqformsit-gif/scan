@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#14323F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>ماسح الحضور</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#14323F;--deep:#0E2630;--panel:#163846;--row:#11303C;--line:#21495A;--soft:#A9C3C9;--sea:#1F6F78;--ok:#2E9E6E;--late:#D99A2B;--dup:#4C7FC4;--bad:#CF5148;--off:#7A63C9}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%;background:var(--deep);color:#fff;font-family:"Cairo","Dubai","Segoe UI",Tahoma,sans-serif;overflow:hidden;font-feature-settings:"tnum" 1}
+  #app{display:flex;flex-direction:column;height:100%}
+  .top{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--ink);font-size:13px;border-bottom:1px solid var(--line)}
+  .top b{font-size:16px;font-weight:700}
+  .dot{width:10px;height:10px;border-radius:50%;background:#999;display:inline-block}
+  .dot.on{background:#4CC38A}.dot.off{background:var(--bad)}
+  .sp{flex:1}
+  .pill{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:2px 10px;white-space:nowrap;font-weight:600}
+  .cam{position:relative;flex:1;min-height:0;background:#000;overflow:hidden}
+  video{width:100%;height:100%;object-fit:cover}
+  .frame{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+  .frame div{width:62vmin;height:62vmin;border:3px solid rgba(255,255,255,.9);border-radius:22px;box-shadow:0 0 0 2000px rgba(14,38,48,.45)}
+  .hint{position:absolute;bottom:12px;left:0;right:0;text-align:center;font-size:14px;opacity:.85}
+  #result{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;gap:8px}
+  #result.on{display:flex}
+  #result .ic{font-size:76px;line-height:1}
+  #result .t{font-size:28px;font-weight:800}
+  #result .n{font-size:34px;font-weight:800}
+  #result .m{font-size:17px;opacity:.95}
+  .bar{display:flex;gap:8px;padding:10px 12px;background:var(--ink);border-top:1px solid var(--line)}
+  button{font:inherit;font-weight:700;border:0;border-radius:12px;padding:12px 14px;background:var(--panel);color:#fff;cursor:pointer}
+  button.p{background:var(--sea)}
+  button:active{transform:scale(.98)}
+  select,input{font:inherit;border-radius:12px;border:1px solid var(--line);background:var(--deep);color:#fff;padding:10px}
+  .list{max-height:30vh;overflow:auto;background:var(--row)}
+  .item{display:flex;gap:10px;align-items:center;padding:9px 14px;border-bottom:1px solid var(--line);font-size:14px}
+  .item .s{width:10px;height:10px;border-radius:50%}
+  .item .tm{color:var(--soft);font-size:12px;min-width:44px}
+  .item .who{flex:1}
+  .screen{position:fixed;inset:0;background:var(--deep);display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:14px;text-align:center;z-index:5}
+  .screen.on{display:flex}
+  .screen h2{margin:0}
+  .screen p{color:var(--soft);max-width:420px;line-height:1.7}
+  .sheet{position:fixed;inset:auto 0 0 0;background:var(--ink);border-top:1px solid var(--line);border-radius:18px 18px 0 0;padding:18px;display:none;flex-direction:column;gap:10px;z-index:6}
+  .sheet.on{display:flex}
+  label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--soft)}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="top">
+    <span class="dot" id="net"></span>
+    <div><b id="center">ماسح الحضور</b><div id="devname" style="opacity:.8"></div></div>
+    <span class="sp"></span>
+    <span class="pill" id="todayCount">اليوم: 0</span>
+    <span class="pill" id="queue" style="display:none"></span>
+    <span class="pill" id="clock"></span>
+  </div>
+  <div class="cam" id="cam">
+    <video id="video" playsinline muted></video>
+    <div class="frame"><div></div></div>
+    <div class="hint" id="hint">وجّه رمز QR داخل الإطار</div>
+    <div id="result"><div class="ic" id="rIc"></div><div class="t" id="rT"></div><div class="n" id="rN"></div><div class="m" id="rM"></div></div>
+  </div>
+  <div class="bar">
+    <select id="course" style="flex:1"><option value="">كل الدورات</option></select>
+    <button onclick="openManual()">إدخال يدوي</button>
+    <button id="torchBtn" onclick="toggleTorch()" style="display:none">🔦</button>
+    <button onclick="openMenu()">⋯</button>
+  </div>
+  <div class="list" id="hist"></div>
+</div>
+
+<div class="screen" id="startScreen">
+  <h2>ماسح الحضور</h2>
+  <p id="startMsg">اضغط للبدء. سيطلب المتصفح إذن الكاميرا: اختر "سماح".</p>
+  <button class="p" style="font-size:18px;padding:16px 28px" onclick="start()">ابدأ المسح</button>
+</div>
+
+<div class="screen" id="setupScreen">
+  <h2>إعداد الجهاز</h2>
+  <p>افتح لوحة التحكم ← <b>أجهزة المسح</b> ← أنشئ جهازًا، ثم امسح رمز الإعداد بكاميرا الهاتف. أو اضغط الزر أدناه وامسحه من هنا.</p>
+  <button class="p" onclick="setupScan()">مسح رمز الإعداد</button>
+  <details style="width:100%;max-width:420px"><summary style="cursor:pointer;color:var(--soft)">إدخال البيانات يدويًا</summary>
+    <label style="margin-top:10px">رابط الواجهة البرمجية<input id="sApi" dir="ltr"></label>
+    <label>مفتاح الجهاز<input id="sKey" dir="ltr"></label>
+    <label>اسم الجهاز<input id="sName"></label>
+    <button class="p" style="margin-top:8px" onclick="saveManualSetup()">حفظ</button>
+  </details>
+</div>
+
+<div class="sheet" id="manual">
+  <b>إدخال الرمز يدويًا</b>
+  <input id="mCode" dir="ltr" placeholder="XXXX-XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" style="font-size:20px;letter-spacing:2px;text-align:center">
+  <div style="display:flex;gap:8px"><button class="p" style="flex:1" onclick="submitManual()">تسجيل</button><button onclick="closeSheets()">إلغاء</button></div>
+</div>
+
+<div class="sheet" id="menu">
+  <b>الجهاز</b>
+  <div id="menuInfo" style="font-size:13px;color:var(--soft);line-height:1.8"></div>
+  <button onclick="syncNow(true)">مزامنة الآن</button>
+  <button onclick="loadRoster(true)">تحديث قائمة الطلاب</button>
+  <button style="background:#5B2A27" onclick="resetDevice()">إلغاء ربط هذا الجهاز</button>
+  <button onclick="closeSheets()">إغلاق</button>
+</div>
+
+<script>
+/* ===================== التخزين ===================== */
+var LS = {
+  get: function (k, d) { try { var v = localStorage.getItem('att_' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set: function (k, v) { try { localStorage.setItem('att_' + k, JSON.stringify(v)); } catch (e) {} }
+};
+var CFG = LS.get('cfg', null), QUEUE = LS.get('queue', []), ROSTER = LS.get('roster', {}), HIST = LS.get('hist', []);
+var ALPH = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+var stream = null, track = null, detector = null, jsqr = null, scanning = false, lastCode = '', lastAt = 0, mode = 'scan', online = navigator.onLine;
+var canvas = document.createElement('canvas'), ctx = canvas.getContext('2d', { willReadFrequently: true });
+function $(id) { return document.getElementById(id); }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function dayKey(t) { var d = new Date(t); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+function hm(t) { var d = new Date(t); return ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2); }
+function uuid() { return (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2)).slice(0, 36); }
+
+/* ===================== الإعداد من الرابط ===================== */
+(function fromHash() {
+  if (!location.hash) return;
+  var p = {};
+  location.hash.slice(1).split('&').forEach(function (kv) { var i = kv.indexOf('='); if (i > 0) p[kv.slice(0, i)] = decodeURIComponent(kv.slice(i + 1)); });
+  if (p.api && p.key) { CFG = { api: p.api, key: p.key, name: p.name || 'جهاز' }; LS.set('cfg', CFG); }
+  history.replaceState(null, '', location.pathname + location.search);
+})();
+
+/* ===================== رموز الحضور ===================== */
+function checksum(t) { var c = 0; for (var i = 0; i < t.length; i++) c = (c * 31 + t.charCodeAt(i)) % 1021; return ALPH[c % 32] + ALPH[Math.floor(c / 32) % 32]; }
+function parseCode(raw) {
+  var s = String(raw || '').trim().toUpperCase();
+  var m = s.match(/^SA1-([2-9A-HJ-NP-Z]{16})-([2-9A-HJ-NP-Z]{2})$/);
+  if (m) return checksum(m[1]) == m[2] ? m[1] : '';
+  var t = s.replace(/[\s-]/g, '').replace(/O/g, '0').replace(/I/g, '1');
+  return /^[2-9A-HJ-NP-Z]{16}$/.test(t) ? t : '';
+}
+function sha12(text) {
+  return crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)).then(function (b) {
+    return Array.prototype.slice.call(new Uint8Array(b), 0, 12).map(function (x) { return ('0' + x.toString(16)).slice(-2); }).join('');
+  });
+}
+
+/* ===================== الصوت والاهتزاز ===================== */
+var AC = null;
+function tone(seq) {
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    var t = AC.currentTime;
+    seq.forEach(function (s) {
+      var o = AC.createOscillator(), g = AC.createGain();
+      o.type = 'sine'; o.frequency.value = s[0];
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.4, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + s[1]);
+      o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t + s[1] + 0.02); t += s[1] + 0.04;
+    });
+  } catch (e) {}
+}
+var LOOK = {
+  present:    { c: 'var(--ok)',   ic: '✓', snd: [[880, .12], [1320, .18]], vib: [60] },
+  late:       { c: 'var(--late)', ic: '⏰', snd: [[880, .14], [660, .2]], vib: [60, 60, 60] },
+  duplicate:  { c: 'var(--dup)',  ic: '↺', snd: [[700, .1]], vib: [30] },
+  offline:    { c: 'var(--off)',  ic: '⇅', snd: [[880, .12], [990, .12]], vib: [60] },
+  pending:    { c: '#163846',     ic: '…', snd: [], vib: [] },
+  error:      { c: 'var(--bad)',  ic: '✕', snd: [[300, .35]], vib: [200, 80, 200] }
+};
+function kind(status) {
+  if (status == 'present' || status == 'late' || status == 'duplicate' || status == 'offline' || status == 'pending') return status;
+  return 'error';
+}
+
+/* ===================== عرض النتيجة ===================== */
+var hideT = null;
+function showResult(status, title, name, msg, ms) {
+  var k = LOOK[kind(status)];
+  var r = $('result');
+  r.style.background = k.c; r.classList.add('on');
+  $('rIc').textContent = k.ic; $('rT').textContent = title; $('rN').textContent = name || ''; $('rM').textContent = msg || '';
+  if (k.snd.length) tone(k.snd);
+  if (navigator.vibrate && k.vib.length) navigator.vibrate(k.vib);
+  clearTimeout(hideT);
+  hideT = setTimeout(function () { r.classList.remove('on'); }, ms || 2200);
+}
+function addHist(h) {
+  HIST.unshift(h); HIST = HIST.slice(0, 40); LS.set('hist', HIST); renderHist();
+}
+function renderHist() {
+  var colors = { present: 'var(--ok)', late: 'var(--late)', duplicate: 'var(--dup)', offline: 'var(--off)', pending: 'var(--soft)' };
+  $('hist').innerHTML = HIST.map(function (h) {
+    return '<div class="item"><span class="s" style="background:' + (colors[h.status] || 'var(--bad)') + '"></span><span class="tm">' + hm(h.t) + '</span><span class="who"><b>' +
+      esc(h.name || '—') + '</b> <span style="color:var(--soft)">' + esc(h.title) + '</span></span><span style="color:var(--soft);font-size:12px">' + esc(h.course || '') + '</span></div>';
+  }).join('');
+  var d = dayKey(Date.now()), n = HIST.filter(function (h) { return (h.status == 'present' || h.status == 'late' || h.status == 'offline') && dayKey(h.t) == d; }).length;
+  $('todayCount').textContent = 'اليوم: ' + n;
+}
+
+/* ===================== الشبكة ===================== */
+function api(method, params, body) {
+  var url = CFG.api + (params ? '?' + Object.keys(params).map(function (k) { return k + '=' + encodeURIComponent(params[k]); }).join('&') : '');
+  var ctl = new AbortController(), to = setTimeout(function () { ctl.abort(); }, 20000);
+  return fetch(url, { method: method, body: body ? JSON.stringify(body) : undefined, signal: ctl.signal, redirect: 'follow' })
+    .then(function (r) { clearTimeout(to); if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(function (j) { setNet(true); if (!j.ok && j.error == 'auth') { authFail(); throw new Error('auth'); } return j; })
+    .catch(function (e) { clearTimeout(to); if (e.message != 'auth') setNet(false); throw e; });
+}
+function setNet(on) { online = on; $('net').className = 'dot ' + (on ? 'on' : 'off'); }
+function authFail() {
+  showResult('error', 'الجهاز غير مفعّل', '', 'تم إيقاف هذا الجهاز من لوحة التحكم أو تغيّر مفتاحه', 6000);
+}
+
+function loadRoster(manual) {
+  return api('GET', { action: 'roster', key: CFG.key }).then(function (j) {
+    var map = {};
+    (j.roster || []).forEach(function (r) { map[r[0]] = [r[1], r[2], r[3]]; });
+    ROSTER = map; LS.set('roster', ROSTER); LS.set('rosterAt', Date.now());
+    if (manual) showResult('present', 'تم التحديث', Object.keys(map).length + ' طالب', '', 1500);
+  }).catch(function () { if (manual) showResult('error', 'تعذّر التحديث', '', 'تحقق من الإنترنت'); });
+}
+function loadCourses() {
+  api('GET', { action: 'courses', key: CFG.key }).then(function (j) {
+    var sel = $('course'), cur = LS.get('course', '');
+    sel.innerHTML = '<option value="">كل الدورات</option>' + (j.courses || []).map(function (c) {
+      return '<option value="' + esc(c.id) + '">' + esc(c.name) + '</option>'; }).join('');
+    sel.value = cur;
+  }).catch(function () {});
+}
+$('course').onchange = function () { LS.set('course', this.value); };
+
+/* ===================== قائمة الانتظار ===================== */
+function saveQueue() { LS.set('queue', QUEUE); var n = QUEUE.length; $('queue').style.display = n ? '' : 'none'; $('queue').textContent = 'بانتظار الإرسال: ' + n; }
+var syncing = false;
+function syncNow(manual) {
+  if (syncing || !QUEUE.length) { if (manual && !QUEUE.length) showResult('present', 'لا شيء للمزامنة', '', '', 1200); return Promise.resolve(); }
+  syncing = true;
+  var batch = QUEUE.slice(0, 20);
+  return api('POST', null, { key: CFG.key, now: Date.now(), course: LS.get('course', ''), scans: batch }).then(function (j) {
+    if (!j.ok) throw new Error(j.error || 'server');
+    var done = {};
+    (j.results || []).forEach(function (r) {
+      done[r.sid] = 1;
+      HIST.forEach(function (h) { if (h.sid == r.sid) { h.status = r.status; h.title = r.title; h.name = r.name || h.name; h.course = r.course || h.course; } });
+      if (r.status != 'present' && r.status != 'late' && r.status != 'duplicate') {
+        tone(LOOK.error.snd);           // تنبيه: مسحة دون اتصال تبيّن أنها مرفوضة
+      }
+    });
+    QUEUE = QUEUE.filter(function (q) { return !done[q.sid]; });
+    saveQueue(); LS.set('hist', HIST); renderHist();
+  }).catch(function () {}).then(function () { syncing = false; });
+}
+
+/* ===================== المسح ===================== */
+function handle(code) {
+  var now = Date.now();
+  if (code == lastCode && now - lastAt < 3500) return;
+  lastCode = code; lastAt = now;
+  if (mode == 'setup') return handleSetup(code);
+  if (/^SAS1\|/.test(code) || /#api=/.test(code)) { showResult('error', 'هذا رمز إعداد جهاز', '', 'افتح القائمة ⋯ لإعادة الربط إن أردت'); return; }
+  var token = parseCode(code);
+  if (!token) { showResult('error', 'ليس رمز حضور', '', 'تأكد أنه الرمز المرسل من المركز'); addHist({ t: now, status: 'invalid', title: 'رمز غير صالح' }); return; }
+  sha12(token).then(function (h) {
+    var info = ROSTER[h];
+    var flt = LS.get('course', '');
+    if (Object.keys(ROSTER).length && !info) { showResult('error', 'رمز غير مسجّل', '', 'قد يكون رمزًا قديمًا تم استبداله'); }
+    else if (info && flt && info[2] != flt) { showResult('error', 'هذا الرمز لدورة أخرى', info[0], 'دورته: ' + info[1]); }
+    else showResult('pending', 'جارٍ التحقق…', info ? info[0] : '', '', 15000);
+    var item = { sid: uuid(), code: token, t: now };
+    var h0 = { sid: item.sid, t: now, status: 'pending', title: 'جارٍ التحقق', name: info ? info[0] : '', course: info ? info[1] : '' };
+    addHist(h0);
+    api('POST', null, { key: CFG.key, now: Date.now(), course: flt, scans: [item] }).then(function (j) {
+      if (!j.ok) throw new Error(j.error || 'server');
+      var r = j.results[0];
+      h0.status = r.status; h0.title = r.title; h0.name = r.name || h0.name; h0.course = r.course || h0.course;
+      LS.set('hist', HIST); renderHist();
+      showResult(r.status, r.title, r.name, [r.session, r.msg].filter(Boolean).join(' — '));
+    }).catch(function (e) {
+      if (e && e.message == 'auth') {                   // device disabled: don't pretend it was saved
+        h0.status = 'auth'; h0.title = 'الجهاز غير مفعّل'; LS.set('hist', HIST); renderHist();
+        return;
+      }
+      item.offline = true; QUEUE.push(item); saveQueue();
+      h0.status = 'offline'; h0.title = 'محفوظ دون اتصال'; LS.set('hist', HIST); renderHist();
+      showResult('offline', 'حُفظ وسيُرسل تلقائيًا', info ? info[0] : '', 'لا يوجد اتصال الآن. الوقت محفوظ بدقة.');
+    });
+  });
+}
+
+function loop() {
+  if (!scanning) return;
+  var v = $('video');
+  if (v.readyState >= 2) {
+    if (detector) {
+      detector.detect(v).then(function (codes) { if (codes.length) handle(codes[0].rawValue); }).catch(function () {}).then(function () { setTimeout(loop, 120); });
+      return;
+    }
+    if (jsqr) {
+      var w = Math.min(640, v.videoWidth), h = Math.round(v.videoHeight * w / v.videoWidth);
+      canvas.width = w; canvas.height = h;
+      ctx.drawImage(v, 0, 0, w, h);
+      var img = ctx.getImageData(0, 0, w, h);
+      var code = jsqr(img.data, w, h, { inversionAttempts: 'dontInvert' });
+      if (code && code.data) handle(code.data);
+    }
+  }
+  setTimeout(loop, 140);
+}
+
+function loadJsQR() {
+  return new Promise(function (ok, fail) {
+    var s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js';
+    s.onload = function () { jsqr = window.jsQR; ok(); };
+    s.onerror = fail;
+    document.head.appendChild(s);
+  });
+}
+
+function startCamera() {
+  return navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false })
+    .then(function (s) {
+      stream = s; track = s.getVideoTracks()[0];
+      var v = $('video'); v.srcObject = s; return v.play();
+    }).then(function () {
+      try { var caps = track.getCapabilities ? track.getCapabilities() : {}; if (caps.torch) $('torchBtn').style.display = ''; } catch (e) {}
+      if ('BarcodeDetector' in window) {
+        return BarcodeDetector.getSupportedFormats().then(function (f) {
+          if (f.indexOf('qr_code') >= 0) detector = new BarcodeDetector({ formats: ['qr_code'] }); else return loadJsQR();
+        });
+      }
+      return loadJsQR();
+    }).then(function () { scanning = true; loop(); });
+}
+
+var torch = false;
+function toggleTorch() { torch = !torch; try { track.applyConstraints({ advanced: [{ torch: torch }] }); } catch (e) {} }
+
+var wake = null;
+function keepAwake() {
+  try { if (navigator.wakeLock) navigator.wakeLock.request('screen').then(function (w) { wake = w; }).catch(function () {}); } catch (e) {}
+}
+document.addEventListener('visibilitychange', function () { if (document.visibilityState == 'visible' && scanning) keepAwake(); });
+
+function start() {
+  tone([[1, .01]]);                  // يفتح الصوت (يتطلب لمسة)
+  $('startMsg').textContent = 'جارٍ تشغيل الكاميرا…';
+  startCamera().then(function () {
+    $('startScreen').classList.remove('on');
+    keepAwake();
+  }).catch(function (e) {
+    $('startMsg').textContent = 'تعذّر تشغيل الكاميرا: ' + (e && e.name == 'NotAllowedError' ? 'لم يُمنح الإذن. فعّله من إعدادات المتصفح للموقع ثم أعد المحاولة.' : (e.message || e));
+  });
+}
+
+/* ===================== الإعداد ===================== */
+function handleSetup(code) {
+  var c = null;
+  if (/^SAS1\|/.test(code)) { var p = code.split('|'); c = { api: p[1], key: p[2], name: p[3] || 'جهاز' }; }
+  else if (/#api=/.test(code)) {
+    var q = {}; code.split('#')[1].split('&').forEach(function (kv) { var i = kv.indexOf('='); q[kv.slice(0, i)] = decodeURIComponent(kv.slice(i + 1)); });
+    c = { api: q.api, key: q.key, name: q.name || 'جهاز' };
+  }
+  if (!c || !c.api || !c.key) { showResult('error', 'ليس رمز إعداد', '', ''); return; }
+  CFG = c; LS.set('cfg', CFG); mode = 'scan';
+  showResult('present', 'تم ربط الجهاز', c.name, '', 1800);
+  setTimeout(function () { location.reload(); }, 1500);
+}
+function setupScan() {
+  mode = 'setup';
+  $('setupScreen').classList.remove('on');
+  startCamera().catch(function (e) { alert('تعذّر تشغيل الكاميرا: ' + (e.message || e)); });
+}
+function saveManualSetup() {
+  var c = { api: $('sApi').value.trim(), key: $('sKey').value.trim(), name: $('sName').value.trim() || 'جهاز' };
+  if (!/^https:\/\/script\.google\.com\/.+\/exec$/.test(c.api) || !c.key) { alert('تحقق من الرابط والمفتاح'); return; }
+  CFG = c; LS.set('cfg', CFG); location.reload();
+}
+function resetDevice() {
+  if (!confirm('إلغاء ربط هذا الهاتف؟ ستحتاج رمز الإعداد من جديد.')) return;
+  if (QUEUE.length && !confirm('يوجد ' + QUEUE.length + ' مسحة لم تُرسل بعد وستُحذف. متابعة؟')) return;
+  localStorage.clear(); location.reload();
+}
+
+/* ===================== الإدخال اليدوي والقائمة ===================== */
+function openManual() { closeSheets(); $('manual').classList.add('on'); $('mCode').value = ''; setTimeout(function () { $('mCode').focus(); }, 50); }
+function submitManual() { var v = $('mCode').value; closeSheets(); lastCode = ''; handle(v); }
+function openMenu() {
+  closeSheets();
+  var at = LS.get('rosterAt', 0);
+  $('menuInfo').innerHTML = 'الجهاز: <b>' + esc(CFG.name) + '</b><br>الطلاب المحمّلون: ' + Object.keys(ROSTER).length +
+    (at ? ' (آخر تحديث ' + hm(at) + ')' : '') + '<br>بانتظار الإرسال: ' + QUEUE.length + '<br>المتصفح يدعم المسح السريع: ' + (detector ? 'نعم' : 'لا (يُستخدم البديل)');
+  $('menu').classList.add('on');
+}
+function closeSheets() { $('manual').classList.remove('on'); $('menu').classList.remove('on'); }
+
+/* ===================== التشغيل ===================== */
+setInterval(function () { $('clock').textContent = hm(Date.now()); }, 1000);
+$('clock').textContent = hm(Date.now());
+renderHist(); saveQueue();
+if (!CFG) {
+  $('setupScreen').classList.add('on');
+} else {
+  $('devname').textContent = CFG.name;
+  $('startScreen').classList.add('on');
+  api('GET', { action: 'ping', key: CFG.key }).then(function (j) {
+    if (j.center) $('center').textContent = j.center;
+    if (j.device && j.device != CFG.name) { CFG.name = j.device; LS.set('cfg', CFG); $('devname').textContent = j.device; }
+  }).catch(function () {});
+  loadCourses();
+  if (!LS.get('rosterAt', 0) || Date.now() - LS.get('rosterAt', 0) > 600000) loadRoster();
+  setInterval(function () { syncNow(); }, 5000);
+  setInterval(function () { loadRoster(); }, 600000);
+  setInterval(function () { api('GET', { action: 'ping', key: CFG.key }).catch(function () {}); }, 300000);   // "I'm alive" for the admin alerts
+  window.addEventListener('online', function () { syncNow(); });
+}
+</script>
+</body>
+</html>
