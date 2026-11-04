@@ -659,7 +659,7 @@ CH.v = (function () {
   var C = CH.C, ST = CH.STATUS;
   function dm(key) { var p = String(key).split('-'); return p.length == 3 ? (+p[2]) + '/' + (+p[1]) : key; }
   function slotTitle(s) { return s.day + ' ' + s.date + ' — ' + (s.n == 'X' ? 'خارج الجدول' : 'الجلسة ' + s.n + ' (' + s.label + ')'); }
-  function rate(x) { var d = x.present + x.late + x.absent; return d ? Math.round((x.present + x.late) * 100 / d) : null; }
+  function rate(x) { var d = x.present + x.late + (x.excused || 0) + x.absent; return d ? Math.round((x.present + x.late) * 100 / d) : null; }   // العذر يُحسب غيابًا
   function statusItems(x, absentLabel) {
     return ST.map(function (s) { return { label: s.key == 'absent' && absentLabel ? absentLabel : s.name, value: x[s.key] || 0, color: s.color }; });
   }
@@ -739,7 +739,7 @@ CH.v = (function () {
       var p = 0, l = 0, a = 0, labels = [], titles = [], vals = [];
       (x.seq || '').split('').forEach(function (c, i) {
         if (c == '-') return;
-        if (c == 'P') p++; else if (c == 'L') l++; else if (c == 'A') a++;
+        if (c == 'P') p++; else if (c == 'L') l++; else a++;                 // A أو E: كلاهما غياب في نسبة الحضور
         labels.push(dm(r.slots[i].date)); titles.push(slotTitle(r.slots[i]));
         vals.push(p + l + a ? Math.round((p + l) * 100 / (p + l + a)) : null);
       });
@@ -768,6 +768,7 @@ function render(d, cached) {
   var warn = [];
   if (d.status != 'مقبول') warn.push('حالتك في الدورة: ' + d.status + '. تواصل مع المركز.');
   if (d.courseStatus != 'نشطة') warn.push('الدورة ' + d.courseStatus + '.');
+  if (d.warn) warn.push(d.warn);
   if (cached) warn.push('أنت دون إنترنت: هذه آخر نسخة محفوظة (' + d.updated + '). الرمز يعمل كالمعتاد.');
   $('msg').innerHTML = warn.map(function (w) { return '<div class="warn">' + esc(w) + '</div>'; }).join('');
   $('next').style.display = d.next ? '' : 'none';

@@ -43,6 +43,9 @@
   .tab{display:none}.tab.on{display:block}
   .empty{padding:24px;text-align:center;color:var(--mute)}
   .low{color:var(--bad);font-weight:bold}
+  .c-warn{background:var(--lateb);color:var(--late)}.c-info{background:var(--excb);color:var(--exc)}
+  .notebox{background:#F6FAF9;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:12px 0}
+  .notebox .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
   .att-sum{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--mute);margin:8px 0 12px}
   .att-sum span{display:inline-flex;align-items:center;gap:6px}.att-sum i{width:10px;height:10px;border-radius:3px}.att-sum b{color:var(--pri)}
   .tw{overflow-x:auto}
@@ -65,7 +68,7 @@
   #print table{font-size:12px;margin-bottom:16px}
   #print th,#print td{border:1px solid #D3DEDB;padding:5px 8px}
   #print .tools{margin-bottom:16px}
-  .pk{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:14px}
+  .pk{display:grid;grid-template-columns:repeat(5,1fr);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:14px}
   .pk div{padding:10px 14px;border-inline-start:1px solid var(--line)}.pk div:first-child{border-inline-start:0}
   .pk b{display:block;font-size:22px;font-weight:800;color:var(--pri)}.pk span{font-size:11.5px;color:var(--mute)}
   .pgrid{display:grid;grid-template-columns:300px 1fr;gap:14px}
@@ -708,7 +711,7 @@ CH.v = (function () {
   var C = CH.C, ST = CH.STATUS;
   function dm(key) { var p = String(key).split('-'); return p.length == 3 ? (+p[2]) + '/' + (+p[1]) : key; }
   function slotTitle(s) { return s.day + ' ' + s.date + ' — ' + (s.n == 'X' ? 'خارج الجدول' : 'الجلسة ' + s.n + ' (' + s.label + ')'); }
-  function rate(x) { var d = x.present + x.late + x.absent; return d ? Math.round((x.present + x.late) * 100 / d) : null; }
+  function rate(x) { var d = x.present + x.late + (x.excused || 0) + x.absent; return d ? Math.round((x.present + x.late) * 100 / d) : null; }   // العذر يُحسب غيابًا
   function statusItems(x, absentLabel) {
     return ST.map(function (s) { return { label: s.key == 'absent' && absentLabel ? absentLabel : s.name, value: x[s.key] || 0, color: s.color }; });
   }
@@ -788,7 +791,7 @@ CH.v = (function () {
       var p = 0, l = 0, a = 0, labels = [], titles = [], vals = [];
       (x.seq || '').split('').forEach(function (c, i) {
         if (c == '-') return;
-        if (c == 'P') p++; else if (c == 'L') l++; else if (c == 'A') a++;
+        if (c == 'P') p++; else if (c == 'L') l++; else a++;                 // A أو E: كلاهما غياب في نسبة الحضور
         labels.push(dm(r.slots[i].date)); titles.push(slotTitle(r.slots[i]));
         vals.push(p + l + a ? Math.round((p + l) * 100 / (p + l + a)) : null);
       });
@@ -804,6 +807,12 @@ var P = {};
 var D = null, timer = null;
 function $(id) { return document.getElementById(id); }
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+var NOTE_CLS = { ok: 'c-ok', warn: 'c-warn', bad: 'c-bad', info: 'c-info', mute: 'c-mute' };
+function noteChip(n, all) {
+  if (!n) return '';
+  var list = all && n.tags.length ? n.tags : [{ t: n.tag, l: n.level }];
+  return list.map(function (x) { return '<span class="chip ' + (NOTE_CLS[x.l] || 'c-mute') + '" title="' + esc(n.text) + '">' + esc(x.t) + '</span>'; }).join(' ');
+}
 function chip(r) {
   if (!r) return '<span class="muted">—</span>';
   var c = /حاضر|يدوي/.test(r) ? 'c-ok' : r == 'متأخر' ? 'c-late' : r == 'عذر' ? 'c-exc' : r == 'غائب' ? 'c-bad' : 'c-mute';
@@ -852,15 +861,16 @@ function render(anim) {
     CH.segbar(el, { height: 10, total: m.rows.length, animate: anim, items: CH.STATUS.map(function (x) { return { label: x.name, value: m[x.key], color: x.color }; }) });
   });
   var lateShare = t.present + t.late ? Math.round(t.late * 100 / (t.present + t.late)) : null;
-  $('kpis').innerHTML = [[r.avg == null ? '—' : r.avg + '%', 'متوسط نسب الطلاب'], [r.below, 'تحت ' + r.threshold + '%'], [r.endedSessions + '<small> / ' + r.totalSessions + '</small>', 'جلسات انتهت'],
-    [r.rows.length, 'طالب'], [lateShare == null ? '—' : lateShare + '%', 'من الحضور متأخرون']]
+  $('kpis').innerHTML = [[r.avg == null ? '—' : r.avg + '%', 'متوسط نسب الحضور'], [r.below, 'تحت ' + r.threshold + '%'], [r.blackCount, '⛔ التزام أقل من ' + r.black + '%'], [r.riskCount, 'مهدد'],
+    [r.endedSessions + '<small> / ' + r.totalSessions + '</small>', 'جلسات انتهت'], [r.rows.length, 'طالب'], [lateShare == null ? '—' : lateShare + '%', 'من الحضور متأخرون']]
     .map(function (k) { return '<div class="kpi"><b>' + k[0] + '</b><span>' + k[1] + '</span></div>'; }).join('');
   CH.v.donut($('trDonut'), t, { size: 172, animate: anim });
   CH.v.distribution($('trDist'), r, { animate: anim });
-  $('stTable').innerHTML = '<table><tr><th>الطالب</th><th>حضور</th><th>تأخير</th><th>عذر</th><th>غياب</th><th class="wide-only">آخر الجلسات</th><th style="width:180px">النسبة</th></tr>' + r.rows.map(function (x, i) {
-    var low = x.pct != null && x.pct < r.threshold;
+  $('stTable').innerHTML = '<table><tr><th>الطالب</th><th>حضور</th><th>تأخير</th><th>عذر</th><th>غياب بلا عذر</th><th class="wide-only">آخر الجلسات</th><th style="width:160px">نسبة الحضور</th><th>الالتزام</th><th>ملاحظة</th></tr>' + r.rows.map(function (x, i) {
+    var low = x.pct != null && x.pct < r.threshold, bad = x.commit != null && x.commit < r.black;
     return '<tr class="st" data-i="' + i + '"><td>' + esc(x.name) + '</td><td>' + x.present + '</td><td>' + x.late + '</td><td>' + x.excused + '</td><td>' + x.absent +
-      '</td><td class="wide-only"><div class="ms" data-i="' + i + '"></div></td><td><div class="row" style="flex-wrap:nowrap"><div class="bar"><i style="width:' + (x.pct || 0) + '%;' + (low ? 'background:#CF5148' : '') + '"></i></div><span class="' + (low ? 'low' : '') + '">' + (x.pct == null ? '—' : x.pct + '%') + '</span></div></td></tr>';
+      '</td><td class="wide-only"><div class="ms" data-i="' + i + '"></div></td><td><div class="row" style="flex-wrap:nowrap"><div class="bar"><i style="width:' + (x.pct || 0) + '%;' + (low ? 'background:#CF5148' : '') + '"></i></div><span class="' + (low ? 'low' : '') + '">' + (x.pct == null ? '—' : x.pct + '%') + '</span></div></td>' +
+      '<td class="' + (bad ? 'low' : '') + '">' + (x.commit == null ? '—' : x.commit + '%') + '</td><td>' + noteChip(x.note) + '</td></tr>';
   }).join('') + '</table>';
   document.querySelectorAll('#stTable .ms').forEach(function (el) { CH.v.studentStrip(el, r.rows[+el.dataset.i], r, { last: 14, small: true, animate: false }); });
   document.querySelectorAll('#stTable tr.st').forEach(function (tr) { tr.onclick = function () { studentDetail(r.rows[+tr.dataset.i]); }; });
@@ -877,6 +887,8 @@ function render(anim) {
 function studentDetail(x) {
   var r = D.report;
   $('modalBody').innerHTML = '<div class="chd"><div><h3>' + esc(x.name) + '</h3><div class="muted">' + esc(r.course.name) + '</div></div><button class="b" onclick="closeModal()">إغلاق</button></div>' +
+    '<div class="notebox"><div class="chips">' + noteChip(x.note, true) + '</div><div>' + esc(x.note ? x.note.text : '') + '</div>' +
+    '<div class="muted" style="margin-top:6px">نسبة الحضور ' + (x.pct == null ? '—' : x.pct + '%') + ' · الالتزام ' + (x.commit == null ? '—' : x.commit + '%') + ' (الحد ' + r.black + '%)</div></div>' +
     '<div id="sdDonut"></div><h4>كل الجلسات</h4><div id="sdStrip"></div><h4>تطور نسبة الحضور</h4><div id="sdTrend"></div>';
   $('modal').classList.add('on');
   CH.donut($('sdDonut'), { size: 150, items: CH.STATUS.map(function (s) { return { label: s.name, value: x[s.key], color: s.color }; }),
@@ -890,14 +902,15 @@ function buildPrint() {
     '<span class="muted">في نافذة الطباعة اختر "حفظ بتنسيق PDF"</span></div>' +
     '<h1>تقرير الحضور — ' + esc(c.name) + '</h1><div class="meta">' + esc(D.center) + (c.trainer ? ' — المدرب: ' + esc(c.trainer) : '') + '<br>المدة: ' + esc(c.start) + (c.end ? ' إلى ' + esc(c.end) : '') +
     ' — ' + esc(c.daysText) + ' — ' + esc(c.sessions.join('، ')) + '<br>تاريخ التقرير: ' + esc(D.updated) + '</div>' +
-    '<div class="pk">' + [[r.avg == null ? '—' : r.avg + '%', 'متوسط نسب الطلاب'], [r.below, 'طالب تحت ' + r.threshold + '%'], [r.endedSessions + ' / ' + r.totalSessions, 'جلسات انتهت'], [r.rows.length, 'طالب']]
+    '<div class="pk">' + [[r.avg == null ? '—' : r.avg + '%', 'متوسط نسب الحضور'], [r.below, 'طالب تحت ' + r.threshold + '%'], [r.blackCount, 'التزام أقل من ' + r.black + '%'], [r.endedSessions + ' / ' + r.totalSessions, 'جلسات انتهت'], [r.rows.length, 'طالب']]
       .map(function (k) { return '<div><b>' + k[0] + '</b><span>' + k[1] + '</span></div>'; }).join('') + '</div>' +
     '<div class="pgrid"><div class="pcard"><h3>توزيع الحضور</h3><div id="pDonut"></div></div><div class="pcard"><h3>نسبة الحضور في كل جلسة</h3><div id="pLine"></div></div></div>' +
     '<div class="pcard"><h3>عدد الطلاب في كل جلسة</h3><div id="pCols"></div></div>' +
-    '<h3>الطلاب</h3><table><tr><th>#</th><th>الطالب</th><th>حضور</th><th>تأخير</th><th>عذر</th><th>غياب</th><th>آخر الجلسات</th><th>النسبة</th></tr>' + r.rows.slice().sort(function (a, b) { return a.name.localeCompare(b.name, 'ar'); }).map(function (x, i) {
-      var low = x.pct != null && x.pct < r.threshold;
+    '<h3>الطلاب</h3><div class="muted" style="margin:-4px 0 8px">نسبة الحضور: الغياب بعذر يُحسب غيابًا. الالتزام: الغياب بلا عذر وحده ينقصه، ومن يقلّ التزامه عن ' + r.black + '% يدخل القائمة السوداء.</div>' +
+    '<table><tr><th>#</th><th>الطالب</th><th>حضور</th><th>تأخير</th><th>عذر</th><th>غياب بلا عذر</th><th>آخر الجلسات</th><th>نسبة الحضور</th><th>الالتزام</th><th>ملاحظة</th></tr>' + r.rows.slice().sort(function (a, b) { return a.name.localeCompare(b.name, 'ar'); }).map(function (x, i) {
+      var low = x.pct != null && x.pct < r.threshold, bad = x.commit != null && x.commit < r.black;
       return '<tr><td>' + (i + 1) + '</td><td>' + esc(x.name) + (x.status != 'مقبول' ? ' (' + esc(x.status) + ')' : '') + '</td><td>' + x.present + '</td><td>' + x.late + '</td><td>' + x.excused + '</td><td>' + x.absent +
-        '</td><td><div class="pms" data-id="' + esc(x.id) + '"></div></td><td class="' + (low ? 'low' : '') + '">' + (x.pct == null ? '—' : x.pct + '%') + '</td></tr>';
+        '</td><td><div class="pms" data-id="' + esc(x.id) + '"></div></td><td class="' + (low ? 'low' : '') + '">' + (x.pct == null ? '—' : x.pct + '%') + '</td><td class="' + (bad ? 'low' : '') + '">' + (x.commit == null ? '—' : x.commit + '%') + '</td><td>' + (x.note ? esc(x.note.tag) : '') + '</td></tr>';
     }).join('') + '</table>' +
     '<h3>الجلسات</h3><table><tr><th>التاريخ</th><th>الجلسة</th><th>حاضر</th><th>متأخر</th><th>عذر</th><th>غائب</th><th>النسبة</th></tr>' + r.slots.map(function (s) {
       var p = CH.v.rate(s);
