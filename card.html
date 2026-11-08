@@ -3,18 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#14323F">
+<meta name="theme-color" content="#301B43">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>بطاقة الحضور</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{--ink:#1D2B32;--mute:#647680;--line:#DCE5E3;--pri:#14323F;--sea:#1F6F78;--mint:#E6F1EF;--ok:#2E9E6E;--late:#D99A2B;--bad:#CF5148;--exc:#4C7FC4}
+  :root{--ink:#211A29;--mute:#71677C;--line:#E5E0EC;--pri:#301B43;--sea:#603F80;--mint:#F1EBF9;--ok:#2E9E6E;--late:#D99A2B;--bad:#CF5148;--exc:#4C7FC4}
   *{box-sizing:border-box}
-  body{margin:0;background:#F4F7F6;color:var(--ink);font-family:"Cairo","Dubai","Segoe UI",Tahoma,sans-serif;line-height:1.6;font-feature-settings:"tnum" 1}
-  .top{background:var(--pri);color:#fff;padding:18px 18px 70px;text-align:center}
-  .top .c{font-size:13px;color:#BFD3D6;font-weight:600}.top .n{font-size:26px;font-weight:800;margin-top:4px}.top .k{font-size:15px;margin-top:2px;color:#D6E6E8}
+  body{margin:0;background:#F8F6FB;color:var(--ink);font-family:"Cairo","Dubai","Segoe UI",Tahoma,sans-serif;line-height:1.6;font-feature-settings:"tnum" 1}
+  .top{background:linear-gradient(120deg,#301B43 0%,#4B2F66 100%);color:#fff;padding:18px 18px 70px;text-align:center}
+  .card.idc{border-top:5px solid var(--sea);padding-top:16px}
+  .idlogo{display:block;height:104px;width:auto;margin:0 auto 12px;color:var(--sea)}
+  .idc .qr{border:1px solid var(--line);border-radius:14px;padding:8px}
+  .top .c{font-size:13px;color:#D2C4E2;font-weight:600}.top .n{font-size:26px;font-weight:800;margin-top:4px}.top .k{font-size:15px;margin-top:2px;color:#E1D4F0}
   .wrap{max-width:460px;margin:-52px auto 0;padding:0 14px 30px}
   .card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:12px}
   .qr{display:block;width:100%;max-width:300px;margin:0 auto;image-rendering:pixelated;background:#fff}
@@ -37,22 +40,45 @@
   .err{background:#FAE7E5;color:#9C3029;border-color:#F2CCC8}
   button{font:inherit;font-weight:700;border:0;border-radius:12px;padding:10px 16px;background:var(--mint);color:var(--pri);cursor:pointer}
   .center{text-align:center}
+  .wait{background:var(--mint);color:var(--pri);border:1px solid #DCCFEA;border-radius:14px;padding:12px 14px;margin-bottom:12px;font-weight:600;text-align:center}
+  .wait b{display:block;font-size:30px;font-weight:800;line-height:1.2}
+  .qr.dim{opacity:.18;filter:grayscale(1)}
+  .tgbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:#2AA3DE;color:#fff;font-size:15px;padding:12px 16px;text-decoration:none;border-radius:14px;font-weight:700}
+  .tgbtn svg{width:22px;height:22px;flex:none}
+  .tgok{display:flex;align-items:center;gap:10px;font-size:14px}
+  .tgok a{margin-inline-start:auto;color:#1D7FB2;font-weight:700;text-decoration:none}
+  .tgdot{width:30px;height:30px;border-radius:50%;background:#2AA3DE;display:flex;align-items:center;justify-content:center;flex:none}
+  .tgdot svg{width:17px;height:17px}
+  label.f{display:block;font-size:13px;font-weight:700;color:var(--mute);margin:10px 0 5px}
+  select,textarea{width:100%;font:inherit;font-size:15px;border:1px solid #D0C8DA;border-radius:12px;padding:10px 12px;background:#fff;color:var(--ink)}
+  textarea{min-height:86px;resize:vertical;line-height:1.7}
+  select:focus,textarea:focus{outline:none;border-color:var(--sea);box-shadow:0 0 0 3px rgba(96,63,128,.14)}
+  button.p{background:var(--sea);color:#fff;width:100%;margin-top:12px;padding:12px}
+  button.p:disabled{opacity:.55}
+  button.ghost{background:transparent;color:var(--sea);padding:6px 0}
+  .req div{padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}
+  .req div:last-child{border:0}
+  .req .top2{display:flex;justify-content:space-between;gap:8px;align-items:center}
+  .req .rp{color:var(--mute);font-size:12.5px;margin-top:2px}
+  .c-wait{background:#FBF0DA;color:#8A5E12}
+  .note{border-radius:12px;padding:10px 12px;margin-top:10px;font-size:14px;font-weight:600}
+  .note.ok{background:#E3F3EB;color:#1F6E4C}.note.no{background:#FAE7E5;color:#9C3029}
 /*@CH-CSS*/
   /* ---------- المخططات (CH) ---------- */
   .ch{position:relative}
   .ch svg{display:block;overflow:visible;max-width:none;direction:ltr}
-  .ch svg text{font-family:inherit;fill:#647680;font-size:11px}
+  .ch svg text{font-family:inherit;fill:#71677C;font-size:11px}
   .ch .ch-tick{font-variant-numeric:tabular-nums}
-  .ch .ch-sub{font-size:10.5px;fill:#8696A0}
-  .ch .ch-axt{font-size:11px;fill:#8696A0}
+  .ch .ch-sub{font-size:10.5px;fill:#857C90}
+  .ch .ch-axt{font-size:11px;fill:#857C90}
   .ch .ch-thl{fill:#9C3029;font-size:11px;font-weight:700}
-  .ch .ch-cap{fill:#14323F;font-size:11.5px;font-weight:700;paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
-  .ch .ch-end{fill:#14323F;font-size:12.5px;font-weight:800;paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
+  .ch .ch-cap{fill:#301B43;font-size:11.5px;font-weight:700;paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
+  .ch .ch-end{fill:#301B43;font-size:12.5px;font-weight:800;paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
   .ch-cols.scroll{overflow-x:auto;overflow-y:hidden;scrollbar-width:thin}
   .ch-col{transition:opacity .18s}
   .ch svg.dim .ch-col:not(.hl){opacity:.35}
   .ch-hit{cursor:pointer;outline:none}
-  .ch-hit:focus-visible{outline:none;stroke:#1F6F78;stroke-width:1.5;stroke-dasharray:3 3}
+  .ch-hit:focus-visible{outline:none;stroke:#603F80;stroke-width:1.5;stroke-dasharray:3 3}
   .ch-cross{display:none;pointer-events:none}
   .ch svg.xon .ch-cross{display:block}
   .ch-arc{transition:stroke-width .18s,opacity .18s;cursor:pointer;outline:none}
@@ -61,50 +87,50 @@
   .ch-donut.solo{justify-content:center}
   .ch-dfig{position:relative;flex:none}
   .ch-dc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;padding:0 18%}
-  .ch-dc b{font-weight:800;color:#14323F;line-height:1.1}
-  .ch-dc span{font-size:11.5px;color:#647680;font-weight:600;line-height:1.35;margin-top:2px}
+  .ch-dc b{font-weight:800;color:#301B43;line-height:1.1}
+  .ch-dc span{font-size:11.5px;color:#71677C;font-weight:600;line-height:1.35;margin-top:2px}
   .ch-legend{display:flex;flex-direction:column;gap:2px;flex:1;min-width:170px;max-width:300px}
   .ch-li{display:flex;align-items:center;gap:9px;font-size:13px;padding:4px 8px;border-radius:9px;transition:background .15s}
-  .ch-li.hl,.ch-li:hover{background:#F1F6F5}
+  .ch-li.hl,.ch-li:hover{background:#F5F2F9}
   .ch-li i{width:10px;height:10px;border-radius:3px;flex:none}
-  .ch-li span{flex:1;color:#1D2B32}
-  .ch-li b{font-weight:700;color:#14323F;font-variant-numeric:tabular-nums}
-  .ch-li em{font-style:normal;color:#647680;font-size:12px;min-width:36px;text-align:left;font-variant-numeric:tabular-nums}
+  .ch-li span{flex:1;color:#211A29}
+  .ch-li b{font-weight:700;color:#301B43;font-variant-numeric:tabular-nums}
+  .ch-li em{font-style:normal;color:#71677C;font-size:12px;min-width:36px;text-align:left;font-variant-numeric:tabular-nums}
   .ch-li.zero{opacity:.45}
-  .ch-tip{position:fixed;z-index:200;background:#fff;border:1px solid #DCE5E3;border-radius:11px;box-shadow:0 12px 32px rgba(20,50,63,.16);
+  .ch-tip{position:fixed;z-index:200;background:#fff;border:1px solid #E5E0EC;border-radius:11px;box-shadow:0 12px 32px rgba(48,27,67,.16);
           padding:9px 12px;font-size:12.5px;pointer-events:none;opacity:0;transform:translateY(4px);transition:opacity .12s,transform .12s;
-          min-width:130px;max-width:330px;direction:rtl;text-align:right;font-family:"Cairo","Dubai","Segoe UI",Tahoma,sans-serif;line-height:1.55;color:#1D2B32}
+          min-width:130px;max-width:330px;direction:rtl;text-align:right;font-family:"Cairo","Dubai","Segoe UI",Tahoma,sans-serif;line-height:1.55;color:#211A29}
   .ch-tip.on{opacity:1;transform:none}
-  .ch-tip-t{font-weight:700;color:#14323F;margin-bottom:3px}
+  .ch-tip-t{font-weight:700;color:#301B43;margin-bottom:3px}
   .ch-tip-r{display:flex;align-items:center;gap:8px}
-  .ch-tip-r b{font-weight:800;color:#14323F;font-variant-numeric:tabular-nums}
-  .ch-tip-r span{color:#647680}
+  .ch-tip-r b{font-weight:800;color:#301B43;font-variant-numeric:tabular-nums}
+  .ch-tip-r span{color:#71677C}
   .ch-key{width:12px;height:3px;border-radius:2px;flex:none}
-  .ch-tip-f{margin-top:5px;padding-top:5px;border-top:1px solid #EDF2F1;color:#647680}
+  .ch-tip-f{margin-top:5px;padding-top:5px;border-top:1px solid #EDE9F2;color:#71677C}
   .ch-hbars{display:flex;flex-direction:column;gap:4px}
   .ch-hrow{display:grid;grid-template-columns:minmax(96px,36%) 1fr 46px;align-items:center;gap:12px;padding:5px 8px;border-radius:9px;outline:none;transition:background .15s}
-  .ch-hrow.hl,.ch-hrow:focus-visible{background:#F1F6F5}
+  .ch-hrow.hl,.ch-hrow:focus-visible{background:#F5F2F9}
   .ch-hrow.click{cursor:pointer}
   .ch-hl{min-width:0;display:flex;flex-direction:column;line-height:1.35}
-  .ch-hl span{font-size:13px;font-weight:600;color:#1D2B32;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .ch-hl small{font-size:11px;color:#647680}
-  .ch-htrack{position:relative;height:12px;background:#EDF2F1;border-radius:2px}
+  .ch-hl span{font-size:13px;font-weight:600;color:#211A29;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ch-hl small{font-size:11px;color:#71677C}
+  .ch-htrack{position:relative;height:12px;background:#EDE9F2;border-radius:2px}
   .ch-htrack i{display:block;height:100%;border-radius:0;border-start-end-radius:4px;border-end-end-radius:4px}
   .ch-hth{position:absolute;top:-4px;bottom:-4px;width:0;border-inline-start:2px dashed #9C3029;margin-inline-start:-1px}
-  .ch-hv{font-weight:800;color:#14323F;font-size:13px;text-align:left;font-variant-numeric:tabular-nums}
-  .ch-empty{padding:22px;text-align:center;color:#647680;font-size:13px}
-  .ch-seg{display:flex;gap:2px;border-radius:99px;overflow:hidden;background:#EDF2F1;transition:clip-path .8s cubic-bezier(.22,.8,.26,1);clip-path:inset(0 0 0 0)}
+  .ch-hv{font-weight:800;color:#301B43;font-size:13px;text-align:left;font-variant-numeric:tabular-nums}
+  .ch-empty{padding:22px;text-align:center;color:#71677C;font-size:13px}
+  .ch-seg{display:flex;gap:2px;border-radius:99px;overflow:hidden;background:#EDE9F2;transition:clip-path .8s cubic-bezier(.22,.8,.26,1);clip-path:inset(0 0 0 0)}
   .ch-seg.grow{clip-path:inset(0 0 0 100%)}
   .ch-seg i{display:block;min-width:3px;outline:none;transition:filter .15s}
-  .ch-seg i.rest{background:#EDF2F1;min-width:0}
+  .ch-seg i.rest{background:#EDE9F2;min-width:0}
   .ch-seg i.hl{filter:brightness(1.12) saturate(1.1)}
   .ch-strip{display:flex;flex-wrap:wrap;gap:3px}
   .ch-strip i{width:13px;height:13px;border-radius:3px;outline:none;transition:transform .15s,opacity .3s}
-  .ch-strip i.none{background:#E4EAE9}
+  .ch-strip i.none{background:#E6E3EB}
   .ch-strip i.hl{transform:scale(1.25)}
   .ch-strip.small{gap:2px;flex-wrap:nowrap}
   .ch-strip.small i{width:8px;height:14px;border-radius:2px}
-  .ch-leg{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:12px;color:#647680;margin-top:10px}
+  .ch-leg{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:12px;color:#71677C;margin-top:10px}
   .ch-leg span{display:inline-flex;align-items:center;gap:6px}
   .ch-leg i{width:10px;height:10px;border-radius:3px;display:inline-block}
   .ch-leg i.ln{width:14px;height:3px;border-radius:2px}
@@ -112,26 +138,29 @@
   .ch-leg em{font-style:normal}
   .ch-spark{display:inline-block;vertical-align:middle}
   .ch-tbl{display:none;width:100%;border-collapse:collapse;font-size:13px}
-  .ch-tbl th,.ch-tbl td{padding:6px 10px;border-bottom:1px solid #DCE5E3;text-align:right}
-  .ch-tbl th{background:#E6F1EF;color:#14323F;font-weight:700;font-size:12px;position:static}
+  .ch-tbl th,.ch-tbl td{padding:6px 10px;border-bottom:1px solid #E5E0EC;text-align:right}
+  .ch-tbl th{background:#F1EBF9;color:#301B43;font-weight:700;font-size:12px;position:static}
   .tbl-on .ch-plot,.tbl-on .ch-leg{display:none}
   .tbl-on .ch-tbl{display:table}
   .chd{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
   .chd>div{flex:1;min-width:0}
   .chd h3{margin:0!important}
   .chd .muted{margin-top:1px}
-  .tg{border:1px solid #DCE5E3;background:#fff;color:#647680;border-radius:8px;padding:2px 10px;font:inherit;font-size:12px;font-weight:600;cursor:pointer;flex:none}
-  .tg:hover{border-color:#1F6F78;color:#14323F}
+  .tg{border:1px solid #E5E0EC;background:#fff;color:#71677C;border-radius:8px;padding:2px 10px;font:inherit;font-size:12px;font-weight:600;cursor:pointer;flex:none}
+  .tg:hover{border-color:#603F80;color:#301B43}
   @media print{.ch *{transition:none!important}.ch-tip{display:none!important}.tg{display:none}}
   @media (prefers-reduced-motion:reduce){.ch *{transition:none!important}}
   /*@CH-CSS-END*/
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><g id="bq-e"><rect x="472.28" y="216.93" width="30.5" height="30.5" rx=".39" ry=".39" transform="translate(-21.38 412.74) rotate(-45)"/><rect x="425.87" y="216.93" width="30.5" height="30.5" rx=".39" ry=".39" transform="translate(-34.97 379.92) rotate(-45)"/><path d="M745.55,233.18h-229.41c-1.33,0-2.66.52-3.46,1.58-.12.16-.25.31-.4.46l-22.41,22.41c-1.68,1.68-4.42,1.68-6.1,0l-17.72-17.72c-1.02-1.02-2.68-1.02-3.7,0l-17.72,17.72c-1.68,1.68-4.42,1.68-6.1,0l-22.41-22.41s-.01-.01-.02-.02c-1.19-1.21-2.72-2.02-4.42-2.02h-76.92c-7.32,0-13.26,5.93-13.26,13.26v211.37h99.49c12.59,0,22.8-1.31,30.64-3.92,7.84-2.61,13.6-6.68,17.28-12.2,3.68-5.52,5.52-12.54,5.52-21.06v-1.74h-23.82c-7.36,0-14.23-.77-20.62-2.32-6.39-1.55-12.2-3.87-17.43-6.97-9.88-5.61-17.57-13.65-23.09-24.11-5.52-10.46-8.28-22.66-8.28-36.6,0-7.36.77-14.18,2.32-20.48,1.55-6.29,3.87-12.05,6.97-17.28,6.58-11.23,16.17-19.9,28.76-26,12.59-6.1,27.69-9.15,45.31-9.15h42.34c2.44,0,4.42,1.98,4.42,4.42v107.7h80.1c2.44,0,4.42-1.98,4.42-4.42v-103.28c0-2.44,1.98-4.42,4.42-4.42h28.63c2.44,0,4.42,1.98,4.42,4.42v117.96c0,11.34-9.19,20.52-20.52,20.52h-101.47v1.45c0,14.33-3.01,26.62-9,36.89-6.01,10.26-14.86,18.05-26.58,23.38-11.72,5.32-26.29,7.99-43.71,7.99h-110.52v118.05h127.56v-.87c7.94,0,14.33-3.15,19.17-9.44,4.84-6.3,7.26-14.28,7.26-23.96v-71.92c.83-.34,1.68-.66,2.48-1.03,11.72-5.33,20.57-13.12,26.58-23.38l.12-.2c2.12-3.65,7.72-2.15,7.72,2.08v59.01h34.27c-.24,0-.45.02-.63.07.18-.05.39-.07.63-.07h133.45c2.44,0,4.42-1.98,4.42-4.42v-115.54c0-2.44,1.98-4.42,4.42-4.42h28.63c2.44,0,4.42,1.98,4.42,4.42v130.23c0,11.34-9.19,20.52-20.52,20.52h-189.09v5.52c0,13.17-2.32,24.54-6.97,34.13-4.65,9.59-11.28,16.99-19.9,22.22-7.98,4.84-22.3,7.44-33.76,7.79v.05h-130.26v19.78c0,7.32,5.93,13.26,13.26,13.26h410.78c7.32,0,13.26-5.93,13.26-13.26V246.44c0-7.32-5.93-13.26-13.26-13.26ZM579.72,469.86l-16.46,16.46c-1.68,1.68-4.42,1.68-6.1,0l-16.46-16.46c-1.68-1.68-1.68-4.42,0-6.1l16.46-16.46c1.68-1.68,4.42-1.68,6.1,0l16.46,16.46c1.68,1.68,1.68,4.42,0,6.1ZM627.83,469.86l-16.46,16.46c-1.68,1.68-4.42,1.68-6.1,0l-16.46-16.46c-1.68-1.68-1.68-4.42,0-6.1l16.46-16.46c1.68-1.68,4.42-1.68,6.1,0l16.46,16.46c1.68,1.68,1.68,4.42,0,6.1ZM720.8,617.6l-16.46,16.46c-1.68,1.68-4.42,1.68-6.1,0l-16.46-16.46c-1.68-1.68-1.68-4.42,0-6.1l16.46-16.46c1.68-1.68,4.42-1.68,6.1,0l16.46,16.46c1.68,1.68,1.68,4.42,0,6.1Z"/><path d="M545.23,566.27c0,.97.49,1.45,1.45,1.45-.8,0-1.45-.65-1.45-1.45Z"/><path d="M470.03,306.77h-4.87c-9.88,0-18.2,1.65-24.98,4.94-6.78,3.29-11.91,8.13-15.4,14.52-3.48,6.39-5.23,14.23-5.23,23.53,0,8.71,1.55,15.88,4.65,21.49,3.09,5.62,7.65,9.83,13.65,12.64,6,2.81,13.36,4.21,22.08,4.21h10.1c2.44,0,4.42-1.98,4.42-4.42v-72.49c0-2.44-1.98-4.42-4.42-4.42Z"/></g><g id="bq-w"><path d="M334.79,716.34h14.23c16.74,0,26.3,8.37,26.3,20.32,0,7.05-3.35,13.27-10.04,17.33-.6.36-.48.72,0,.96,8.85,4.42,13.87,13.03,13.87,21.16,0,16.97-16.02,24.03-31.8,24.03h-24.87c-.6,0-.95-.36-.95-.96v-71.25c0-5.74,5.5-11.59,13.27-11.59ZM345.31,750.28c8.96,0,14.58-4.18,14.58-10.04,0-6.7-3.7-9.56-10.04-9.56h-12.31v19.6h7.77ZM346.02,785.79c10.28,0,17.09-2.75,17.09-11.24,0-8.97-8.85-9.92-18.77-9.92h-6.81v21.16h8.49Z"/><path d="M388.33,799.3l26.54-71.48c3.35-8.97,9.92-11.48,16.5-11.48,1.91,0,2.51.24,2.99,1.67l30.72,81.29c.24.48,0,.84-.6.84-7.41,0-15.3,1.43-18.89-7.05l-7.29-17.33h-26.06l-6.1,17.33c-2.51,7.29-10.76,7.05-17.21,7.05-.6,0-.84-.36-.6-.84ZM416.79,761.4h16.97l-8.49-23.43-8.49,23.43Z"/><path d="M478.34,728.05c0-6.69,5.38-11.6,13.27-11.6h13.15c18.17,0,31.8,7.17,31.8,24.15,0,8.97-3.95,22.47-16.5,24.98-.6.12-.6.48,0,.6,1.67.36,3.47,2.03,5.02,4.78l15.66,28.21c.24.48.24.96-.48.96-7.53,0-15.06,0-17.93-4.9l-12.19-21.4c-2.51-4.3-7.29-5.5-11.12-5.5h-4.66v21.28c0,7.17-7.89,10.52-15.06,10.52-.48,0-.95-.36-.95-.96v-71.13ZM494.36,754.11h9.68c8.85,0,16.38-3.23,16.38-12.07,0-7.29-5.5-11.36-13.03-11.36h-13.03v23.43Z"/><path d="M566.19,716.45h36.34c.6,0,.95.48.95.96,0,7.53-2.63,13.39-10.16,13.39h-24.39v18.65h32.63c.6,0,.96.36.96.96,0,5.86-1.79,13.39-10.52,13.39h-23.07v21.99h24.27c8.97,0,10.16,5.74,10.16,13.39,0,.48-.36.96-.96.96h-48.65c-.6,0-.95-.36-.95-.96v-71.36c0-8.01,5.5-11.36,13.39-11.36Z"/><path d="M631.22,716.45h36.34c.6,0,.95.48.95.96,0,7.53-2.63,13.39-10.16,13.39h-24.39v18.65h32.63c.6,0,.96.36.96.96,0,5.86-1.79,13.39-10.52,13.39h-23.07v21.99h24.27c8.97,0,10.16,5.74,10.16,13.39,0,.48-.36.96-.96.96h-48.65c-.6,0-.95-.36-.95-.96v-71.36c0-8.01,5.5-11.36,13.39-11.36Z"/><path d="M675.92,758.53c0-22.71,17.21-43.15,40.4-43.15s40.28,20.44,40.28,42.91c0,17.33-10.16,32.63-25.22,38.61-.6.24-.72.84-.6,1.31.96,3.59,4.66,3.95,6.34,3.95,3.59,0,6.93-1.67,8.25-2.27.95-.48,2.15.36,1.2,1.55-1.2,1.55-6.34,9.2-15.3,9.2-6.93,0-14.46-4.18-17.34-9.92-.24-.48-.84-.96-1.43-.96-22.59.36-36.58-20.08-36.58-41.24ZM716.2,786.86c15.18,0,24.27-14.7,24.27-28.57s-9.08-29.77-24.27-29.77-24.03,16.14-24.03,29.77,8.73,28.57,24.03,28.57Z"/></g><g id="bq-t"><path d="M334.86,866.07l-.02,2.89h-13.74v-22.03h13.74v2.89h-10.15v6.64h8.11v2.8h-8.11v6.81h10.16Z"/><path d="M358.07,857.95c0,1.63-.26,3.12-.8,4.48-.53,1.35-1.28,2.51-2.24,3.48-.96.97-2.12,1.72-3.47,2.26s-2.85.8-4.5.8h-8.32v-22.03h8.32c1.65,0,3.15.27,4.5.8,1.35.54,2.51,1.29,3.47,2.26.96.97,1.71,2.13,2.24,3.48.53,1.35.8,2.84.8,4.47ZM354.41,857.95c0-1.26-.17-2.4-.51-3.41-.34-1.01-.83-1.86-1.47-2.56-.64-.69-1.41-1.23-2.32-1.6-.91-.37-1.93-.56-3.06-.56h-4.73v16.25h4.73c1.13,0,2.15-.18,3.06-.55.91-.37,1.68-.9,2.32-1.6.64-.7,1.13-1.55,1.47-2.55.34-1,.51-2.14.51-3.42Z"/><path d="M370.69,866.07c.85,0,1.6-.14,2.27-.43.67-.29,1.23-.68,1.7-1.19.46-.51.82-1.12,1.06-1.84.24-.72.37-1.52.37-2.39v-13.28h3.56v13.28c0,1.3-.21,2.49-.62,3.6-.41,1.1-1.01,2.05-1.78,2.85-.77.8-1.71,1.43-2.82,1.88-1.11.45-2.35.68-3.74.68s-2.63-.23-3.74-.68c-1.11-.45-2.05-1.08-2.82-1.88-.78-.8-1.37-1.75-1.78-2.85-.41-1.1-.62-2.3-.62-3.6v-13.28h3.58v13.27c0,.88.12,1.68.37,2.39.24.72.6,1.34,1.06,1.85.46.52,1.02.92,1.69,1.2.67.28,1.43.43,2.27.43Z"/><path d="M399.93,864.06c.19,0,.36.08.51.23l1.42,1.54c-.9,1.08-2,1.92-3.31,2.5-1.3.59-2.87.88-4.68.88-1.61,0-3.07-.28-4.37-.83-1.3-.56-2.41-1.33-3.33-2.33-.92-.99-1.62-2.18-2.12-3.56-.5-1.38-.74-2.89-.74-4.54s.26-3.17.79-4.55c.52-1.38,1.26-2.57,2.22-3.56.95-1,2.1-1.77,3.43-2.32,1.33-.55,2.8-.83,4.4-.83s3,.26,4.22.77c1.22.52,2.28,1.2,3.17,2.06l-1.18,1.67c-.08.11-.18.21-.29.29s-.27.12-.46.12c-.2,0-.43-.09-.7-.28-.26-.19-.59-.4-1-.63s-.91-.44-1.52-.63c-.61-.19-1.36-.28-2.27-.28-1.05,0-2.02.18-2.89.55-.88.37-1.63.9-2.26,1.61-.63.7-1.12,1.56-1.48,2.57-.35,1.01-.53,2.16-.53,3.44s.18,2.45.55,3.47c.37,1.02.87,1.87,1.52,2.57s1.4,1.23,2.26,1.6c.87.37,1.8.55,2.8.55.61,0,1.16-.03,1.64-.1s.93-.17,1.34-.32c.41-.15.79-.33,1.15-.56s.72-.5,1.08-.83c.21-.18.41-.28.61-.28Z"/><path d="M423.41,868.97h-2.77c-.32,0-.57-.08-.77-.24s-.34-.35-.44-.59l-1.84-4.87h-9.49l-1.83,4.87c-.08.2-.23.39-.43.57-.21.17-.46.26-.77.26h-2.77l8.74-22.03h3.63l8.74,22.03ZM416.63,860.7l-3.03-8.05c-.24-.62-.5-1.41-.75-2.37-.11.48-.24.92-.37,1.32-.13.4-.26.76-.37,1.06l-3.03,8.03h7.54Z"/><path d="M438.98,849.92h-6.87v19.05h-3.56v-19.05h-6.88v-2.98h17.32v2.98Z"/><path d="M445.64,868.97h-3.6v-22.03h3.6v22.03Z"/><path d="M471.57,857.95c0,1.63-.26,3.14-.8,4.51-.53,1.38-1.28,2.56-2.24,3.56-.96,1-2.12,1.77-3.47,2.33-1.35.56-2.85.84-4.5.84s-3.14-.28-4.49-.84c-1.35-.56-2.51-1.34-3.48-2.33s-1.72-2.18-2.25-3.56c-.53-1.38-.8-2.88-.8-4.51s.26-3.14.8-4.51c.53-1.38,1.28-2.56,2.25-3.56.97-1,2.13-1.78,3.48-2.34,1.35-.56,2.85-.84,4.49-.84s3.15.28,4.5.84c1.35.56,2.51,1.34,3.47,2.34.96,1,1.71,2.19,2.24,3.56.53,1.38.8,2.88.8,4.51ZM467.92,857.95c0-1.26-.17-2.4-.51-3.41-.34-1.01-.83-1.87-1.47-2.57-.64-.7-1.41-1.24-2.32-1.62-.91-.38-1.93-.57-3.06-.57s-2.14.19-3.05.57c-.91.38-1.68.92-2.32,1.62-.64.7-1.14,1.56-1.49,2.57-.35,1.01-.52,2.15-.52,3.41s.17,2.42.52,3.43c.35,1.01.84,1.86,1.49,2.56.64.7,1.42,1.23,2.32,1.61.91.37,1.92.56,3.05.56s2.15-.19,3.06-.56c.91-.37,1.68-.91,2.32-1.61.64-.7,1.13-1.55,1.47-2.56s.51-2.15.51-3.43Z"/><path d="M493.73,846.93v22.03h-1.82c-.28,0-.51-.05-.7-.15-.19-.1-.38-.26-.55-.48l-12.1-15.55c.03.3.05.59.07.88.02.29.02.56.02.8v14.49h-3.15v-22.03h1.87c.15,0,.28,0,.39.02s.21.04.3.09c.09.04.18.1.26.18s.17.18.26.31l12.12,15.56c-.03-.32-.05-.63-.07-.93s-.02-.59-.02-.86v-14.37h3.14Z"/><path d="M525.79,868.97h-3.2c-.17,0-.33,0-.47-.03-.14-.02-.27-.05-.38-.1-.12-.05-.23-.11-.34-.19-.11-.08-.22-.19-.35-.32l-1.84-1.87c-.97.86-2.07,1.53-3.3,2.02s-2.56.73-4,.73c-.84,0-1.65-.14-2.46-.43-.8-.28-1.52-.7-2.15-1.23-.63-.54-1.14-1.19-1.53-1.96-.39-.77-.58-1.64-.58-2.61,0-.7.11-1.37.34-1.99.23-.62.55-1.2.96-1.74.41-.54.9-1.02,1.46-1.45.56-.43,1.18-.8,1.85-1.1-.58-.78-1-1.53-1.27-2.27s-.4-1.48-.4-2.23.14-1.47.41-2.14c.28-.67.68-1.26,1.2-1.76.53-.5,1.16-.89,1.91-1.19.75-.29,1.6-.44,2.55-.44.86,0,1.63.13,2.32.4.69.27,1.28.62,1.77,1.07.5.45.88.96,1.16,1.55.28.58.45,1.18.5,1.8l-2.08.43c-.18.04-.36.02-.51-.08-.16-.09-.28-.24-.36-.46-.08-.27-.2-.53-.35-.79-.15-.26-.34-.49-.57-.7-.22-.2-.49-.37-.8-.5-.31-.13-.67-.19-1.08-.19-.47,0-.89.08-1.26.23-.37.15-.69.36-.95.63-.26.27-.46.58-.6.94-.14.36-.21.74-.21,1.15,0,.33.04.64.11.95.07.31.19.61.35.92.16.31.37.62.62.94.25.32.55.67.91,1.03l6.08,6.26c.37-.67.66-1.37.87-2.1.21-.73.36-1.47.43-2.21.02-.21.09-.38.21-.51.12-.13.29-.19.49-.19h2.04c-.01,1.27-.2,2.5-.57,3.68-.37,1.18-.9,2.27-1.57,3.28l4.61,4.74ZM511.31,858.41c-.94.55-1.63,1.19-2.08,1.93-.45.73-.67,1.53-.67,2.39,0,.6.11,1.14.33,1.61.22.47.51.87.87,1.2.36.33.78.58,1.26.75s.97.26,1.48.26c1.01,0,1.93-.17,2.75-.51s1.56-.8,2.2-1.38l-6.14-6.24Z"/><path d="M555.53,857.95c0,1.63-.26,3.12-.8,4.48-.53,1.35-1.28,2.51-2.24,3.48-.96.97-2.12,1.72-3.47,2.26-1.35.54-2.85.8-4.5.8h-8.32v-22.03h8.32c1.65,0,3.15.27,4.5.8,1.35.54,2.51,1.29,3.47,2.26.96.97,1.71,2.13,2.24,3.48.53,1.35.8,2.84.8,4.47ZM551.87,857.95c0-1.26-.17-2.4-.51-3.41-.34-1.01-.83-1.86-1.47-2.56-.64-.69-1.41-1.23-2.32-1.6s-1.93-.56-3.06-.56h-4.73v16.25h4.73c1.13,0,2.15-.18,3.06-.55.91-.37,1.68-.9,2.32-1.6.64-.7,1.13-1.55,1.47-2.55.34-1,.51-2.14.51-3.42Z"/><path d="M573.22,866.07l-.02,2.89h-13.74v-22.03h13.74v2.89h-10.15v6.64h8.11v2.8h-8.11v6.81h10.16Z"/><path d="M595.53,846.93l-8.94,22.03h-3.23l-8.94-22.03h2.86c.32,0,.57.08.77.24.19.16.34.36.44.59l5.68,14.37c.31.81.59,1.73.84,2.78.11-.52.23-1.01.36-1.49.13-.47.27-.9.42-1.3l5.66-14.37c.08-.2.22-.39.43-.57.2-.17.46-.26.76-.26h2.88Z"/><path d="M611.85,866.07l-.02,2.89h-13.74v-22.03h13.74v2.89h-10.15v6.64h8.11v2.8h-8.11v6.81h10.16Z"/><path d="M628.45,865.97v3h-12.73v-22.03h3.58v19.04h9.15Z"/><path d="M651.34,857.95c0,1.63-.26,3.14-.8,4.51-.53,1.38-1.28,2.56-2.24,3.56-.96,1-2.12,1.77-3.47,2.33-1.35.56-2.85.84-4.5.84s-3.14-.28-4.49-.84c-1.35-.56-2.51-1.34-3.48-2.33-.97-1-1.72-2.18-2.25-3.56-.53-1.38-.8-2.88-.8-4.51s.26-3.14.8-4.51c.53-1.38,1.28-2.56,2.25-3.56.97-1,2.13-1.78,3.48-2.34,1.35-.56,2.85-.84,4.49-.84s3.15.28,4.5.84c1.35.56,2.51,1.34,3.47,2.34.96,1,1.71,2.19,2.24,3.56.53,1.38.8,2.88.8,4.51ZM647.69,857.95c0-1.26-.17-2.4-.51-3.41-.34-1.01-.83-1.87-1.47-2.57-.64-.7-1.41-1.24-2.32-1.62-.91-.38-1.93-.57-3.06-.57s-2.14.19-3.05.57c-.91.38-1.68.92-2.32,1.62-.64.7-1.14,1.56-1.49,2.57-.35,1.01-.52,2.15-.52,3.41s.17,2.42.52,3.43c.35,1.01.84,1.86,1.49,2.56.64.7,1.42,1.23,2.32,1.61.91.37,1.92.56,3.05.56s2.15-.19,3.06-.56c.91-.37,1.68-.91,2.32-1.61.64-.7,1.13-1.55,1.47-2.56.34-1.01.51-2.15.51-3.43Z"/><path d="M662.12,846.93c1.44,0,2.69.17,3.74.51s1.93.81,2.62,1.41c.69.61,1.2,1.34,1.54,2.19.34.85.51,1.79.51,2.82s-.18,2.01-.54,2.88c-.36.87-.89,1.62-1.59,2.25-.7.63-1.58,1.12-2.62,1.47-1.05.35-2.26.53-3.65.53h-3.27v7.97h-3.58v-22.03h6.85ZM662.12,858.16c.8,0,1.5-.1,2.1-.31.61-.21,1.11-.49,1.52-.86.4-.37.7-.82.91-1.35.2-.53.31-1.12.31-1.78s-.1-1.22-.3-1.73c-.2-.51-.5-.94-.89-1.3-.4-.36-.9-.63-1.51-.82-.61-.19-1.32-.28-2.13-.28h-3.27v8.43h3.27Z"/><path d="M697.39,846.93v22.03h-3.15v-15.1c0-.24,0-.51.02-.8.02-.29.04-.58.07-.88l-7.08,13.08c-.28.54-.7.81-1.27.81h-.51c-.58,0-1-.27-1.27-.81l-7.19-13.11c.03.3.05.59.07.89s.02.57.02.83v15.1h-3.15v-22.03h2.68c.32,0,.56.03.73.09.17.06.33.23.47.51l7.07,12.81c.15.3.3.6.44.91.14.31.26.63.37.96.12-.33.25-.65.39-.97.14-.32.28-.63.43-.92l6.96-12.78c.14-.29.3-.46.47-.51.17-.06.42-.09.73-.09h2.68Z"/><path d="M716.37,866.07l-.02,2.89h-13.74v-22.03h13.74v2.89h-10.15v6.64h8.11v2.8h-8.11v6.81h10.16Z"/><path d="M738.48,846.93v22.03h-1.82c-.28,0-.51-.05-.7-.15-.19-.1-.38-.26-.55-.48l-12.1-15.55c.03.3.05.59.07.88.02.29.02.56.02.8v14.49h-3.15v-22.03h1.87c.15,0,.28,0,.39.02s.21.04.3.09c.09.04.18.1.26.18s.17.18.26.31l12.12,15.56c-.03-.32-.05-.63-.07-.93s-.02-.59-.02-.86v-14.37h3.14Z"/><path d="M758.9,849.92h-6.87v19.05h-3.56v-19.05h-6.88v-2.98h17.32v2.98Z"/></g></defs></svg>
 <div class="top"><div class="c" id="center">بطاقة الحضور</div><div class="n" id="name">…</div><div class="k" id="course"></div></div>
 <div class="wrap">
   <div id="msg"></div>
-  <div class="card">
+  <div class="wait" id="wait" style="display:none"></div>
+  <div class="card idc">
+    <svg class="idlogo" viewBox="309 199 462 682" fill="currentColor" role="img" aria-label="بريق للتعليم والتطوير"><use href="#bq-e"/><use href="#bq-w"/><use href="#bq-t"/></svg>
     <img class="qr" id="qr" alt="QR">
     <div class="code" id="code"></div>
     <div class="tip">ارفع سطوع الشاشة وأبرز الرمز عند الدخول</div>
@@ -145,6 +174,12 @@
     <div class="muted" id="thr" style="margin-top:10px"></div>
     <div id="stripBox" style="display:none"><h4>جلساتي <span class="muted">(الأقدم على اليمين)</span></h4><div id="strip"></div></div>
   </div>
+  <div class="card" id="excCard" style="display:none">
+    <h3>📝 طلب عذر</h3>
+    <div id="excForm"></div>
+    <div id="excReq"></div>
+  </div>
+  <div class="card" id="tgCard" style="display:none"></div>
   <div class="card"><h3>السجل</h3><div class="hist" id="hist"><div class="muted">لا توجد جلسات بعد</div></div></div>
   <div class="center"><span class="muted" id="upd"></span> <button onclick="load()">تحديث</button></div>
 </div>
@@ -161,9 +196,9 @@ var CH = (function () {
   var RM = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   var C = {
     present: '#2E9E6E', late: '#D99A2B', excused: '#4C7FC4', absent: '#CF5148',
-    waiting: '#A3B4B8', upcoming: '#E1E8E6', none: '#E4EAE9',
-    sea: '#1F6F78', ink: '#14323F', text: '#1D2B32', mute: '#647680',
-    grid: '#E9EFEE', axis: '#C8D5D2', track: '#EDF2F1', th: '#9C3029', surface: '#FFFFFF'
+    waiting: '#AEA7B8', upcoming: '#E5E1E9', none: '#E6E3EB',
+    sea: '#603F80', ink: '#301B43', text: '#211A29', mute: '#71677C',
+    grid: '#E9E6ED', axis: '#D0C8DA', track: '#EDE9F2', th: '#9C3029', surface: '#FFFFFF'
   };
   var STATUS = [
     { key: 'present', name: 'حاضر', color: C.present },
@@ -765,8 +800,11 @@ function render(d, cached) {
   $('center').textContent = d.center; $('name').textContent = d.name; $('course').textContent = d.course;
   document.title = 'بطاقة ' + d.name;
   $('qr').src = d.qr; $('code').textContent = d.code;
-  var warn = [];
-  if (d.status != 'مقبول') warn.push('حالتك في الدورة: ' + d.status + '. تواصل مع المركز.');
+  var warn = [], waiting = d.status == 'قائمة الانتظار';
+  $('wait').style.display = waiting ? '' : 'none';
+  if (waiting) $('wait').innerHTML = 'أنت في قائمة الانتظار' + (d.waitPos ? '<b>#' + d.waitPos + '</b>ترتيبك في الدور' : '') + '<div class="muted" style="margin-top:4px">يعمل رمزك تلقائيًا فور توفر مقعد، وتصلك رسالة بذلك.</div>';
+  $('qr').classList.toggle('dim', waiting);
+  if (d.status != 'مقبول' && !waiting) warn.push('حالتك في الدورة: ' + d.status + '. تواصل مع المركز.');
   if (d.courseStatus != 'نشطة') warn.push('الدورة ' + d.courseStatus + '.');
   if (d.warn) warn.push(d.warn);
   if (cached) warn.push('أنت دون إنترنت: هذه آخر نسخة محفوظة (' + d.updated + '). الرمز يعمل كالمعتاد.');
@@ -786,8 +824,67 @@ function render(d, cached) {
     return '<div><span>' + esc(h.day) + ' ' + esc(h.date) + ' <span class="muted">ج' + esc(h.n) + '</span></span><span>' + (h.time ? '<span class="muted">' + esc(h.time) + '</span> ' : '') + chip(h.result) + '</span></div>';
   }).join('') : '<div class="muted">لا توجد جلسات بعد</div>';
   $('upd').textContent = 'آخر تحديث: ' + d.updated;
+  renderExcuse(d, cached);
+  renderTg(d, cached);
 }
-function load() {
+var TG_ICON = '<svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M21.9 4.3 18.7 19.4c-.2 1.1-.9 1.3-1.8.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.3-5 9.1-8.2c.4-.4-.1-.6-.6-.2L6.2 13.1 1.4 11.6c-1-.3-1.1-1 .2-1.5L20.5 2.8c.9-.3 1.7.2 1.4 1.5z"/></svg>';
+var EXC_SEL = '';
+function excChip(st) {
+  var cls = /^مقبول/.test(st) ? 'c-ok' : /مراجعة/.test(st) ? 'c-wait' : /لا حاجة|لم يُطبَّق/.test(st) ? 'c-exc' : 'c-bad';
+  return '<span class="chip ' + cls + '">' + esc(st) + '</span>';
+}
+function renderExcuse(d, cached) {
+  var x = d.excuse || { slots: [], requests: [] };
+  $('excCard').style.display = x.slots.length || x.requests.length ? '' : 'none';
+  if (!x.slots.length && !x.requests.length) return;
+  $('excForm').innerHTML = x.slots.length ? (cached ? '<div class="muted">يحتاج طلب العذر إلى إنترنت.</div>' :
+    '<div class="muted">عن غياب خلال آخر 14 يومًا، أو جلسة خلال الأسبوع القادم. تراجعه الإدارة ويصلك الرد' + (d.bot && d.bot.linked ? ' على تلغرام' : ' هنا') + '.</div>' +
+    '<label class="f" for="exSlot">الجلسة</label><select id="exSlot">' + slotGroups(x.slots) + '</select>' +
+    '<label class="f" for="exWhy">السبب</label><textarea id="exWhy" maxlength="300" placeholder="مثال: موعد طبي، وسأحضر التقرير"></textarea>' +
+    '<button class="p" id="exGo" onclick="sendExcuse()">إرسال الطلب</button><div id="exNote"></div>') : '';
+  $('excReq').innerHTML = x.requests.length ? '<h4>طلباتي</h4><div class="req">' + x.requests.map(function (q) {
+    return '<div><div class="top2"><span>' + esc(q.day) + ' ' + esc(q.date) + ' <span class="muted">ج' + esc(q.n) + '</span></span>' + excChip(q.status) + '</div>' +
+      '<div class="rp">' + esc(q.reason) + (q.reply ? '<br><b>رد المركز:</b> ' + esc(q.reply) : '') + '</div></div>';
+  }).join('') + '</div>' : '';
+}
+/** الغياب السابق أولًا (الأحدث فالأقدم)، ثم الجلسات القادمة (الأقرب فالأبعد). نص قصير يتسع لشاشة الهاتف. */
+function slotGroups(slots) {
+  function opt(s) {
+    var p = s.date.split('-'), t = String(s.label).split('-')[0];
+    return '<option value="' + esc(s.key) + '"' + (s.key == EXC_SEL ? ' selected' : '') + '>' + esc(s.day) + ' ' + (+p[2]) + '/' + (+p[1]) + ' — ج' + esc(s.n) + ' الساعة ' + esc(t) + (s.when == 'now' ? ' (الآن)' : '') + '</option>';
+  }
+  var past = slots.filter(function (s) { return s.when != 'future'; }).reverse(), fut = slots.filter(function (s) { return s.when == 'future'; });
+  return (past.length ? '<optgroup label="غياب سابق">' + past.map(opt).join('') + '</optgroup>' : '') +
+         (fut.length ? '<optgroup label="جلسات قادمة">' + fut.map(opt).join('') + '</optgroup>' : '');
+}
+function sendExcuse() {
+  var slot = $('exSlot').value, why = $('exWhy').value.trim();
+  if (why.length < 5) { $('exNote').innerHTML = '<div class="note no">اكتب السبب بوضوح (5 أحرف على الأقل)</div>'; $('exWhy').focus(); return; }
+  $('exGo').disabled = true; $('exGo').textContent = 'جارٍ الإرسال…';
+  fetch(CFG.api, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'excuse', t: CFG.t, slot: slot, reason: why }) })
+    .then(function (r) { return r.json(); }).then(function (r) {
+      if (!r.ok) { $('exGo').disabled = false; $('exGo').textContent = 'إرسال الطلب'; $('exNote').innerHTML = '<div class="note no">' + esc(r.error || 'تعذّر الإرسال') + '</div>'; return; }
+      EXC_SEL = ''; load(function () { $('exNote') && ($('exNote').innerHTML = ''); var h = $('excReq'); if (h) h.insertAdjacentHTML('afterbegin', '<div class="note ok">✓ وصل طلبك وهو قيد المراجعة</div>'); });
+    }).catch(function () { $('exGo').disabled = false; $('exGo').textContent = 'إرسال الطلب'; $('exNote').innerHTML = '<div class="note no">لا يوجد اتصال. حاول مجددًا.</div>'; });
+}
+function renderTg(d, cached) {
+  var b = d.bot;
+  $('tgCard').style.display = b ? '' : 'none';
+  if (!b) return;
+  $('tgCard').innerHTML = b.linked
+    ? '<div class="tgok"><span class="tgdot">' + TG_ICON + '</span><span><b>مربوط ببوت ' + esc(b.name) + '</b><br><span class="muted">تصلك التذكيرات وتأكيد الحضور على تلغرام</span></span><a href="https://t.me/' + esc(b.user) + '" target="_blank">فتح</a></div>'
+    : '<h3>' + esc(b.name) + ' على تلغرام</h3><div class="muted" style="margin-bottom:10px">تذكير كل مساء بجلسات الغد، تأكيد فوري عند تسجيل حضورك، وطلب عذر بضغطة.</div>' +
+      '<a class="tgbtn" href="#" id="tgGo" onclick="tgLink();return false">' + TG_ICON + 'ربط مع تلغرام</a><div id="tgNote"></div>';
+}
+function tgLink() {
+  var go = $('tgGo'); go.style.opacity = .6;
+  fetch(CFG.api + '?action=tglink&t=' + encodeURIComponent(CFG.t)).then(function (r) { return r.json(); }).then(function (r) {
+    go.style.opacity = 1;
+    if (r.ok) location.href = r.url;
+    else $('tgNote').innerHTML = '<div class="note no">' + (r.error == 'bot_off' ? 'البوت غير متاح حاليًا.' : 'تعذّر إنشاء رابط الربط.') + '</div>';
+  }).catch(function () { go.style.opacity = 1; $('tgNote').innerHTML = '<div class="note no">يحتاج الربط إلى إنترنت.</div>'; });
+}
+function load(after) {
   if (!CFG.t || !CFG.api) { $('msg').innerHTML = '<div class="warn err">الرابط غير مكتمل. افتح الرابط المرسل إليك من المركز.</div>'; return; }
   fetch(CFG.api + '?action=card&t=' + encodeURIComponent(CFG.t)).then(function (r) { return r.json(); }).then(function (d) {
     if (!d.ok) {
@@ -796,7 +893,11 @@ function load() {
       $('msg').innerHTML = '<div class="warn err">هذا الرمز لم يعد صالحًا (ربما أُصدر لك رمز جديد). تواصل مع المركز أو افتح أحدث رسالة وصلتك.</div>';
       return;
     }
+    if ($('exSlot')) EXC_SEL = $('exSlot').value;
+    var draft = $('exWhy') ? $('exWhy').value : '';
     ls('data', d); render(d, false);
+    if (draft && $('exWhy') && !after) $('exWhy').value = draft;           // لا يضيع ما كتبه عند التحديث
+    if (after) after();
   }).catch(function () {
     var d = ls('data');
     if (d) render(d, true); else $('msg').innerHTML = '<div class="warn err">لا يوجد اتصال بالإنترنت. افتح الصفحة مرة واحدة مع الإنترنت لتُحفظ على هاتفك.</div>';

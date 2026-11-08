@@ -3,18 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#14323F">
+<meta name="theme-color" content="#301B43">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>ماسح الحضور</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{--ink:#14323F;--deep:#0E2630;--panel:#163846;--row:#11303C;--line:#21495A;--soft:#A9C3C9;--sea:#1F6F78;--ok:#2E9E6E;--late:#D99A2B;--dup:#4C7FC4;--bad:#CF5148;--off:#7A63C9}
+  :root{--ink:#301B43;--deep:#180D22;--panel:#2C1E3A;--row:#21152E;--line:#473759;--soft:#C4B8D3;--sea:#603F80;--ok:#2E9E6E;--late:#D99A2B;--dup:#4C7FC4;--bad:#CF5148;--off:#3D8FA0}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;height:100%;background:var(--deep);color:#fff;font-family:"Cairo","Dubai","Segoe UI",Tahoma,sans-serif;overflow:hidden;font-feature-settings:"tnum" 1}
   #app{display:flex;flex-direction:column;height:100%}
-  .top{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--ink);font-size:13px;border-bottom:1px solid var(--line)}
+  .top{display:flex;align-items:center;gap:10px;padding:10px 14px;background:linear-gradient(120deg,#301B43 0%,#4B2F66 100%);font-size:13px;border-bottom:1px solid var(--line)}
   .top b{font-size:16px;font-weight:700}
   .dot{width:10px;height:10px;border-radius:50%;background:#999;display:inline-block}
   .dot.on{background:#4CC38A}.dot.off{background:var(--bad)}
@@ -23,10 +23,16 @@
   .cam{position:relative;flex:1;min-height:0;background:#000;overflow:hidden}
   video{width:100%;height:100%;object-fit:cover}
   .frame{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
-  .frame div{width:62vmin;height:62vmin;border:3px solid rgba(255,255,255,.9);border-radius:22px;box-shadow:0 0 0 2000px rgba(14,38,48,.45)}
+  .frame div{width:62vmin;height:62vmin;border:3px solid rgba(255,255,255,.9);border-radius:22px;box-shadow:0 0 0 2000px rgba(24,13,34,.45)}
   .hint{position:absolute;bottom:12px;left:0;right:0;text-align:center;font-size:14px;opacity:.85}
   #result{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;gap:8px}
   #result.on{display:flex}
+  #result .bolt{position:absolute;top:12px;inset-inline-start:14px;font-size:12px;font-weight:700;opacity:.8;letter-spacing:.3px}
+  .fix{position:absolute;top:10px;left:10px;right:10px;z-index:6;display:none;align-items:center;gap:10px;background:#9C3029;color:#fff;border-radius:14px;padding:11px 14px;font-weight:700;font-size:15px;line-height:1.5;box-shadow:0 10px 30px rgba(0,0,0,.4);cursor:pointer}
+  .fix.on{display:flex}.fix.soft{background:#2F5A93}
+  .fix .x{font-size:22px;flex:none}
+  .item .ck{font-size:11px;color:var(--soft);min-width:20px;text-align:center;letter-spacing:-2px}
+  .item .ck.ok{color:#7FD3AE}
   #result .ic{font-size:76px;line-height:1}
   #result .t{font-size:28px;font-weight:800}
   #result .n{font-size:34px;font-weight:800}
@@ -44,6 +50,8 @@
   .screen{position:fixed;inset:0;background:var(--deep);display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:14px;text-align:center;z-index:5}
   .screen.on{display:flex}
   .screen h2{margin:0}
+  .slogo{height:120px;width:auto;color:#fff;margin-bottom:6px}
+  .tlogo{height:30px;width:auto;color:#fff;flex:none}
   .screen p{color:var(--soft);max-width:420px;line-height:1.7}
   .sheet{position:fixed;inset:auto 0 0 0;background:var(--ink);border-top:1px solid var(--line);border-radius:18px 18px 0 0;padding:18px;display:none;flex-direction:column;gap:10px;z-index:6}
   .sheet.on{display:flex}
@@ -57,8 +65,10 @@
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><g id="bq-e"><rect x="472.28" y="216.93" width="30.5" height="30.5" rx=".39" ry=".39" transform="translate(-21.38 412.74) rotate(-45)"/><rect x="425.87" y="216.93" width="30.5" height="30.5" rx=".39" ry=".39" transform="translate(-34.97 379.92) rotate(-45)"/><path d="M745.55,233.18h-229.41c-1.33,0-2.66.52-3.46,1.58-.12.16-.25.31-.4.46l-22.41,22.41c-1.68,1.68-4.42,1.68-6.1,0l-17.72-17.72c-1.02-1.02-2.68-1.02-3.7,0l-17.72,17.72c-1.68,1.68-4.42,1.68-6.1,0l-22.41-22.41s-.01-.01-.02-.02c-1.19-1.21-2.72-2.02-4.42-2.02h-76.92c-7.32,0-13.26,5.93-13.26,13.26v211.37h99.49c12.59,0,22.8-1.31,30.64-3.92,7.84-2.61,13.6-6.68,17.28-12.2,3.68-5.52,5.52-12.54,5.52-21.06v-1.74h-23.82c-7.36,0-14.23-.77-20.62-2.32-6.39-1.55-12.2-3.87-17.43-6.97-9.88-5.61-17.57-13.65-23.09-24.11-5.52-10.46-8.28-22.66-8.28-36.6,0-7.36.77-14.18,2.32-20.48,1.55-6.29,3.87-12.05,6.97-17.28,6.58-11.23,16.17-19.9,28.76-26,12.59-6.1,27.69-9.15,45.31-9.15h42.34c2.44,0,4.42,1.98,4.42,4.42v107.7h80.1c2.44,0,4.42-1.98,4.42-4.42v-103.28c0-2.44,1.98-4.42,4.42-4.42h28.63c2.44,0,4.42,1.98,4.42,4.42v117.96c0,11.34-9.19,20.52-20.52,20.52h-101.47v1.45c0,14.33-3.01,26.62-9,36.89-6.01,10.26-14.86,18.05-26.58,23.38-11.72,5.32-26.29,7.99-43.71,7.99h-110.52v118.05h127.56v-.87c7.94,0,14.33-3.15,19.17-9.44,4.84-6.3,7.26-14.28,7.26-23.96v-71.92c.83-.34,1.68-.66,2.48-1.03,11.72-5.33,20.57-13.12,26.58-23.38l.12-.2c2.12-3.65,7.72-2.15,7.72,2.08v59.01h34.27c-.24,0-.45.02-.63.07.18-.05.39-.07.63-.07h133.45c2.44,0,4.42-1.98,4.42-4.42v-115.54c0-2.44,1.98-4.42,4.42-4.42h28.63c2.44,0,4.42,1.98,4.42,4.42v130.23c0,11.34-9.19,20.52-20.52,20.52h-189.09v5.52c0,13.17-2.32,24.54-6.97,34.13-4.65,9.59-11.28,16.99-19.9,22.22-7.98,4.84-22.3,7.44-33.76,7.79v.05h-130.26v19.78c0,7.32,5.93,13.26,13.26,13.26h410.78c7.32,0,13.26-5.93,13.26-13.26V246.44c0-7.32-5.93-13.26-13.26-13.26ZM579.72,469.86l-16.46,16.46c-1.68,1.68-4.42,1.68-6.1,0l-16.46-16.46c-1.68-1.68-1.68-4.42,0-6.1l16.46-16.46c1.68-1.68,4.42-1.68,6.1,0l16.46,16.46c1.68,1.68,1.68,4.42,0,6.1ZM627.83,469.86l-16.46,16.46c-1.68,1.68-4.42,1.68-6.1,0l-16.46-16.46c-1.68-1.68-1.68-4.42,0-6.1l16.46-16.46c1.68-1.68,4.42-1.68,6.1,0l16.46,16.46c1.68,1.68,1.68,4.42,0,6.1ZM720.8,617.6l-16.46,16.46c-1.68,1.68-4.42,1.68-6.1,0l-16.46-16.46c-1.68-1.68-1.68-4.42,0-6.1l16.46-16.46c1.68-1.68,4.42-1.68,6.1,0l16.46,16.46c1.68,1.68,1.68,4.42,0,6.1Z"/><path d="M545.23,566.27c0,.97.49,1.45,1.45,1.45-.8,0-1.45-.65-1.45-1.45Z"/><path d="M470.03,306.77h-4.87c-9.88,0-18.2,1.65-24.98,4.94-6.78,3.29-11.91,8.13-15.4,14.52-3.48,6.39-5.23,14.23-5.23,23.53,0,8.71,1.55,15.88,4.65,21.49,3.09,5.62,7.65,9.83,13.65,12.64,6,2.81,13.36,4.21,22.08,4.21h10.1c2.44,0,4.42-1.98,4.42-4.42v-72.49c0-2.44-1.98-4.42-4.42-4.42Z"/></g><g id="bq-w"><path d="M334.79,716.34h14.23c16.74,0,26.3,8.37,26.3,20.32,0,7.05-3.35,13.27-10.04,17.33-.6.36-.48.72,0,.96,8.85,4.42,13.87,13.03,13.87,21.16,0,16.97-16.02,24.03-31.8,24.03h-24.87c-.6,0-.95-.36-.95-.96v-71.25c0-5.74,5.5-11.59,13.27-11.59ZM345.31,750.28c8.96,0,14.58-4.18,14.58-10.04,0-6.7-3.7-9.56-10.04-9.56h-12.31v19.6h7.77ZM346.02,785.79c10.28,0,17.09-2.75,17.09-11.24,0-8.97-8.85-9.92-18.77-9.92h-6.81v21.16h8.49Z"/><path d="M388.33,799.3l26.54-71.48c3.35-8.97,9.92-11.48,16.5-11.48,1.91,0,2.51.24,2.99,1.67l30.72,81.29c.24.48,0,.84-.6.84-7.41,0-15.3,1.43-18.89-7.05l-7.29-17.33h-26.06l-6.1,17.33c-2.51,7.29-10.76,7.05-17.21,7.05-.6,0-.84-.36-.6-.84ZM416.79,761.4h16.97l-8.49-23.43-8.49,23.43Z"/><path d="M478.34,728.05c0-6.69,5.38-11.6,13.27-11.6h13.15c18.17,0,31.8,7.17,31.8,24.15,0,8.97-3.95,22.47-16.5,24.98-.6.12-.6.48,0,.6,1.67.36,3.47,2.03,5.02,4.78l15.66,28.21c.24.48.24.96-.48.96-7.53,0-15.06,0-17.93-4.9l-12.19-21.4c-2.51-4.3-7.29-5.5-11.12-5.5h-4.66v21.28c0,7.17-7.89,10.52-15.06,10.52-.48,0-.95-.36-.95-.96v-71.13ZM494.36,754.11h9.68c8.85,0,16.38-3.23,16.38-12.07,0-7.29-5.5-11.36-13.03-11.36h-13.03v23.43Z"/><path d="M566.19,716.45h36.34c.6,0,.95.48.95.96,0,7.53-2.63,13.39-10.16,13.39h-24.39v18.65h32.63c.6,0,.96.36.96.96,0,5.86-1.79,13.39-10.52,13.39h-23.07v21.99h24.27c8.97,0,10.16,5.74,10.16,13.39,0,.48-.36.96-.96.96h-48.65c-.6,0-.95-.36-.95-.96v-71.36c0-8.01,5.5-11.36,13.39-11.36Z"/><path d="M631.22,716.45h36.34c.6,0,.95.48.95.96,0,7.53-2.63,13.39-10.16,13.39h-24.39v18.65h32.63c.6,0,.96.36.96.96,0,5.86-1.79,13.39-10.52,13.39h-23.07v21.99h24.27c8.97,0,10.16,5.74,10.16,13.39,0,.48-.36.96-.96.96h-48.65c-.6,0-.95-.36-.95-.96v-71.36c0-8.01,5.5-11.36,13.39-11.36Z"/><path d="M675.92,758.53c0-22.71,17.21-43.15,40.4-43.15s40.28,20.44,40.28,42.91c0,17.33-10.16,32.63-25.22,38.61-.6.24-.72.84-.6,1.31.96,3.59,4.66,3.95,6.34,3.95,3.59,0,6.93-1.67,8.25-2.27.95-.48,2.15.36,1.2,1.55-1.2,1.55-6.34,9.2-15.3,9.2-6.93,0-14.46-4.18-17.34-9.92-.24-.48-.84-.96-1.43-.96-22.59.36-36.58-20.08-36.58-41.24ZM716.2,786.86c15.18,0,24.27-14.7,24.27-28.57s-9.08-29.77-24.27-29.77-24.03,16.14-24.03,29.77,8.73,28.57,24.03,28.57Z"/></g><g id="bq-t"><path d="M334.86,866.07l-.02,2.89h-13.74v-22.03h13.74v2.89h-10.15v6.64h8.11v2.8h-8.11v6.81h10.16Z"/><path d="M358.07,857.95c0,1.63-.26,3.12-.8,4.48-.53,1.35-1.28,2.51-2.24,3.48-.96.97-2.12,1.72-3.47,2.26s-2.85.8-4.5.8h-8.32v-22.03h8.32c1.65,0,3.15.27,4.5.8,1.35.54,2.51,1.29,3.47,2.26.96.97,1.71,2.13,2.24,3.48.53,1.35.8,2.84.8,4.47ZM354.41,857.95c0-1.26-.17-2.4-.51-3.41-.34-1.01-.83-1.86-1.47-2.56-.64-.69-1.41-1.23-2.32-1.6-.91-.37-1.93-.56-3.06-.56h-4.73v16.25h4.73c1.13,0,2.15-.18,3.06-.55.91-.37,1.68-.9,2.32-1.6.64-.7,1.13-1.55,1.47-2.55.34-1,.51-2.14.51-3.42Z"/><path d="M370.69,866.07c.85,0,1.6-.14,2.27-.43.67-.29,1.23-.68,1.7-1.19.46-.51.82-1.12,1.06-1.84.24-.72.37-1.52.37-2.39v-13.28h3.56v13.28c0,1.3-.21,2.49-.62,3.6-.41,1.1-1.01,2.05-1.78,2.85-.77.8-1.71,1.43-2.82,1.88-1.11.45-2.35.68-3.74.68s-2.63-.23-3.74-.68c-1.11-.45-2.05-1.08-2.82-1.88-.78-.8-1.37-1.75-1.78-2.85-.41-1.1-.62-2.3-.62-3.6v-13.28h3.58v13.27c0,.88.12,1.68.37,2.39.24.72.6,1.34,1.06,1.85.46.52,1.02.92,1.69,1.2.67.28,1.43.43,2.27.43Z"/><path d="M399.93,864.06c.19,0,.36.08.51.23l1.42,1.54c-.9,1.08-2,1.92-3.31,2.5-1.3.59-2.87.88-4.68.88-1.61,0-3.07-.28-4.37-.83-1.3-.56-2.41-1.33-3.33-2.33-.92-.99-1.62-2.18-2.12-3.56-.5-1.38-.74-2.89-.74-4.54s.26-3.17.79-4.55c.52-1.38,1.26-2.57,2.22-3.56.95-1,2.1-1.77,3.43-2.32,1.33-.55,2.8-.83,4.4-.83s3,.26,4.22.77c1.22.52,2.28,1.2,3.17,2.06l-1.18,1.67c-.08.11-.18.21-.29.29s-.27.12-.46.12c-.2,0-.43-.09-.7-.28-.26-.19-.59-.4-1-.63s-.91-.44-1.52-.63c-.61-.19-1.36-.28-2.27-.28-1.05,0-2.02.18-2.89.55-.88.37-1.63.9-2.26,1.61-.63.7-1.12,1.56-1.48,2.57-.35,1.01-.53,2.16-.53,3.44s.18,2.45.55,3.47c.37,1.02.87,1.87,1.52,2.57s1.4,1.23,2.26,1.6c.87.37,1.8.55,2.8.55.61,0,1.16-.03,1.64-.1s.93-.17,1.34-.32c.41-.15.79-.33,1.15-.56s.72-.5,1.08-.83c.21-.18.41-.28.61-.28Z"/><path d="M423.41,868.97h-2.77c-.32,0-.57-.08-.77-.24s-.34-.35-.44-.59l-1.84-4.87h-9.49l-1.83,4.87c-.08.2-.23.39-.43.57-.21.17-.46.26-.77.26h-2.77l8.74-22.03h3.63l8.74,22.03ZM416.63,860.7l-3.03-8.05c-.24-.62-.5-1.41-.75-2.37-.11.48-.24.92-.37,1.32-.13.4-.26.76-.37,1.06l-3.03,8.03h7.54Z"/><path d="M438.98,849.92h-6.87v19.05h-3.56v-19.05h-6.88v-2.98h17.32v2.98Z"/><path d="M445.64,868.97h-3.6v-22.03h3.6v22.03Z"/><path d="M471.57,857.95c0,1.63-.26,3.14-.8,4.51-.53,1.38-1.28,2.56-2.24,3.56-.96,1-2.12,1.77-3.47,2.33-1.35.56-2.85.84-4.5.84s-3.14-.28-4.49-.84c-1.35-.56-2.51-1.34-3.48-2.33s-1.72-2.18-2.25-3.56c-.53-1.38-.8-2.88-.8-4.51s.26-3.14.8-4.51c.53-1.38,1.28-2.56,2.25-3.56.97-1,2.13-1.78,3.48-2.34,1.35-.56,2.85-.84,4.49-.84s3.15.28,4.5.84c1.35.56,2.51,1.34,3.47,2.34.96,1,1.71,2.19,2.24,3.56.53,1.38.8,2.88.8,4.51ZM467.92,857.95c0-1.26-.17-2.4-.51-3.41-.34-1.01-.83-1.87-1.47-2.57-.64-.7-1.41-1.24-2.32-1.62-.91-.38-1.93-.57-3.06-.57s-2.14.19-3.05.57c-.91.38-1.68.92-2.32,1.62-.64.7-1.14,1.56-1.49,2.57-.35,1.01-.52,2.15-.52,3.41s.17,2.42.52,3.43c.35,1.01.84,1.86,1.49,2.56.64.7,1.42,1.23,2.32,1.61.91.37,1.92.56,3.05.56s2.15-.19,3.06-.56c.91-.37,1.68-.91,2.32-1.61.64-.7,1.13-1.55,1.47-2.56s.51-2.15.51-3.43Z"/><path d="M493.73,846.93v22.03h-1.82c-.28,0-.51-.05-.7-.15-.19-.1-.38-.26-.55-.48l-12.1-15.55c.03.3.05.59.07.88.02.29.02.56.02.8v14.49h-3.15v-22.03h1.87c.15,0,.28,0,.39.02s.21.04.3.09c.09.04.18.1.26.18s.17.18.26.31l12.12,15.56c-.03-.32-.05-.63-.07-.93s-.02-.59-.02-.86v-14.37h3.14Z"/><path d="M525.79,868.97h-3.2c-.17,0-.33,0-.47-.03-.14-.02-.27-.05-.38-.1-.12-.05-.23-.11-.34-.19-.11-.08-.22-.19-.35-.32l-1.84-1.87c-.97.86-2.07,1.53-3.3,2.02s-2.56.73-4,.73c-.84,0-1.65-.14-2.46-.43-.8-.28-1.52-.7-2.15-1.23-.63-.54-1.14-1.19-1.53-1.96-.39-.77-.58-1.64-.58-2.61,0-.7.11-1.37.34-1.99.23-.62.55-1.2.96-1.74.41-.54.9-1.02,1.46-1.45.56-.43,1.18-.8,1.85-1.1-.58-.78-1-1.53-1.27-2.27s-.4-1.48-.4-2.23.14-1.47.41-2.14c.28-.67.68-1.26,1.2-1.76.53-.5,1.16-.89,1.91-1.19.75-.29,1.6-.44,2.55-.44.86,0,1.63.13,2.32.4.69.27,1.28.62,1.77,1.07.5.45.88.96,1.16,1.55.28.58.45,1.18.5,1.8l-2.08.43c-.18.04-.36.02-.51-.08-.16-.09-.28-.24-.36-.46-.08-.27-.2-.53-.35-.79-.15-.26-.34-.49-.57-.7-.22-.2-.49-.37-.8-.5-.31-.13-.67-.19-1.08-.19-.47,0-.89.08-1.26.23-.37.15-.69.36-.95.63-.26.27-.46.58-.6.94-.14.36-.21.74-.21,1.15,0,.33.04.64.11.95.07.31.19.61.35.92.16.31.37.62.62.94.25.32.55.67.91,1.03l6.08,6.26c.37-.67.66-1.37.87-2.1.21-.73.36-1.47.43-2.21.02-.21.09-.38.21-.51.12-.13.29-.19.49-.19h2.04c-.01,1.27-.2,2.5-.57,3.68-.37,1.18-.9,2.27-1.57,3.28l4.61,4.74ZM511.31,858.41c-.94.55-1.63,1.19-2.08,1.93-.45.73-.67,1.53-.67,2.39,0,.6.11,1.14.33,1.61.22.47.51.87.87,1.2.36.33.78.58,1.26.75s.97.26,1.48.26c1.01,0,1.93-.17,2.75-.51s1.56-.8,2.2-1.38l-6.14-6.24Z"/><path d="M555.53,857.95c0,1.63-.26,3.12-.8,4.48-.53,1.35-1.28,2.51-2.24,3.48-.96.97-2.12,1.72-3.47,2.26-1.35.54-2.85.8-4.5.8h-8.32v-22.03h8.32c1.65,0,3.15.27,4.5.8,1.35.54,2.51,1.29,3.47,2.26.96.97,1.71,2.13,2.24,3.48.53,1.35.8,2.84.8,4.47ZM551.87,857.95c0-1.26-.17-2.4-.51-3.41-.34-1.01-.83-1.86-1.47-2.56-.64-.69-1.41-1.23-2.32-1.6s-1.93-.56-3.06-.56h-4.73v16.25h4.73c1.13,0,2.15-.18,3.06-.55.91-.37,1.68-.9,2.32-1.6.64-.7,1.13-1.55,1.47-2.55.34-1,.51-2.14.51-3.42Z"/><path d="M573.22,866.07l-.02,2.89h-13.74v-22.03h13.74v2.89h-10.15v6.64h8.11v2.8h-8.11v6.81h10.16Z"/><path d="M595.53,846.93l-8.94,22.03h-3.23l-8.94-22.03h2.86c.32,0,.57.08.77.24.19.16.34.36.44.59l5.68,14.37c.31.81.59,1.73.84,2.78.11-.52.23-1.01.36-1.49.13-.47.27-.9.42-1.3l5.66-14.37c.08-.2.22-.39.43-.57.2-.17.46-.26.76-.26h2.88Z"/><path d="M611.85,866.07l-.02,2.89h-13.74v-22.03h13.74v2.89h-10.15v6.64h8.11v2.8h-8.11v6.81h10.16Z"/><path d="M628.45,865.97v3h-12.73v-22.03h3.58v19.04h9.15Z"/><path d="M651.34,857.95c0,1.63-.26,3.14-.8,4.51-.53,1.38-1.28,2.56-2.24,3.56-.96,1-2.12,1.77-3.47,2.33-1.35.56-2.85.84-4.5.84s-3.14-.28-4.49-.84c-1.35-.56-2.51-1.34-3.48-2.33-.97-1-1.72-2.18-2.25-3.56-.53-1.38-.8-2.88-.8-4.51s.26-3.14.8-4.51c.53-1.38,1.28-2.56,2.25-3.56.97-1,2.13-1.78,3.48-2.34,1.35-.56,2.85-.84,4.49-.84s3.15.28,4.5.84c1.35.56,2.51,1.34,3.47,2.34.96,1,1.71,2.19,2.24,3.56.53,1.38.8,2.88.8,4.51ZM647.69,857.95c0-1.26-.17-2.4-.51-3.41-.34-1.01-.83-1.87-1.47-2.57-.64-.7-1.41-1.24-2.32-1.62-.91-.38-1.93-.57-3.06-.57s-2.14.19-3.05.57c-.91.38-1.68.92-2.32,1.62-.64.7-1.14,1.56-1.49,2.57-.35,1.01-.52,2.15-.52,3.41s.17,2.42.52,3.43c.35,1.01.84,1.86,1.49,2.56.64.7,1.42,1.23,2.32,1.61.91.37,1.92.56,3.05.56s2.15-.19,3.06-.56c.91-.37,1.68-.91,2.32-1.61.64-.7,1.13-1.55,1.47-2.56.34-1.01.51-2.15.51-3.43Z"/><path d="M662.12,846.93c1.44,0,2.69.17,3.74.51s1.93.81,2.62,1.41c.69.61,1.2,1.34,1.54,2.19.34.85.51,1.79.51,2.82s-.18,2.01-.54,2.88c-.36.87-.89,1.62-1.59,2.25-.7.63-1.58,1.12-2.62,1.47-1.05.35-2.26.53-3.65.53h-3.27v7.97h-3.58v-22.03h6.85ZM662.12,858.16c.8,0,1.5-.1,2.1-.31.61-.21,1.11-.49,1.52-.86.4-.37.7-.82.91-1.35.2-.53.31-1.12.31-1.78s-.1-1.22-.3-1.73c-.2-.51-.5-.94-.89-1.3-.4-.36-.9-.63-1.51-.82-.61-.19-1.32-.28-2.13-.28h-3.27v8.43h3.27Z"/><path d="M697.39,846.93v22.03h-3.15v-15.1c0-.24,0-.51.02-.8.02-.29.04-.58.07-.88l-7.08,13.08c-.28.54-.7.81-1.27.81h-.51c-.58,0-1-.27-1.27-.81l-7.19-13.11c.03.3.05.59.07.89s.02.57.02.83v15.1h-3.15v-22.03h2.68c.32,0,.56.03.73.09.17.06.33.23.47.51l7.07,12.81c.15.3.3.6.44.91.14.31.26.63.37.96.12-.33.25-.65.39-.97.14-.32.28-.63.43-.92l6.96-12.78c.14-.29.3-.46.47-.51.17-.06.42-.09.73-.09h2.68Z"/><path d="M716.37,866.07l-.02,2.89h-13.74v-22.03h13.74v2.89h-10.15v6.64h8.11v2.8h-8.11v6.81h10.16Z"/><path d="M738.48,846.93v22.03h-1.82c-.28,0-.51-.05-.7-.15-.19-.1-.38-.26-.55-.48l-12.1-15.55c.03.3.05.59.07.88.02.29.02.56.02.8v14.49h-3.15v-22.03h1.87c.15,0,.28,0,.39.02s.21.04.3.09c.09.04.18.1.26.18s.17.18.26.31l12.12,15.56c-.03-.32-.05-.63-.07-.93s-.02-.59-.02-.86v-14.37h3.14Z"/><path d="M758.9,849.92h-6.87v19.05h-3.56v-19.05h-6.88v-2.98h17.32v2.98Z"/></g></defs></svg>
 <div id="app">
   <div class="top">
+    <svg class="tlogo" viewBox="309 199 462 484" fill="currentColor" role="img" aria-label="بريق"><use href="#bq-e"/></svg>
     <span class="dot" id="net"></span>
     <div><b id="center">ماسح الحضور</b><div id="devname" style="opacity:.8"></div></div>
     <span class="sp"></span>
@@ -70,7 +80,8 @@
     <video id="video" playsinline muted></video>
     <div class="frame"><div></div></div>
     <div class="hint" id="hint">وجّه رمز QR داخل الإطار<div class="live" id="live"><i></i><span>القارئ يعمل</span></div></div>
-    <div id="result"><div class="ic" id="rIc"></div><div class="t" id="rT"></div><div class="n" id="rN"></div><div class="m" id="rM"></div></div>
+    <div id="result"><div class="bolt" id="rB"></div><div class="ic" id="rIc"></div><div class="t" id="rT"></div><div class="n" id="rN"></div><div class="m" id="rM"></div></div>
+    <div class="fix" id="fix" onclick="this.classList.remove('on')" role="alert"></div>
   </div>
   <div class="bar">
     <select id="course" style="flex:1"><option value="">كل الدورات</option></select>
@@ -82,12 +93,14 @@
 </div>
 
 <div class="screen" id="startScreen">
+  <svg class="slogo" viewBox="309 199 462 623" fill="currentColor" role="img" aria-label="بريق"><use href="#bq-e"/><use href="#bq-w"/></svg>
   <h2>ماسح الحضور</h2>
   <p id="startMsg">اضغط للبدء. سيطلب المتصفح إذن الكاميرا: اختر "سماح".</p>
   <button class="p" style="font-size:18px;padding:16px 28px" onclick="start()">ابدأ المسح</button>
 </div>
 
 <div class="screen" id="setupScreen">
+  <svg class="slogo" viewBox="309 199 462 623" fill="currentColor" role="img" aria-label="بريق"><use href="#bq-e"/><use href="#bq-w"/></svg>
   <h2>إعداد الجهاز</h2>
   <p>افتح لوحة التحكم ← <b>أجهزة المسح</b> ← أنشئ جهازًا، ثم امسح رمز الإعداد بكاميرا الهاتف. أو اضغط الزر أدناه وامسحه من هنا.</p>
   <button class="p" onclick="setupScan()">مسح رمز الإعداد</button>
@@ -125,6 +138,8 @@ var LS = {
   set: function (k, v) { try { localStorage.setItem('att_' + k, JSON.stringify(v)); } catch (e) {} }
 };
 var CFG = LS.get('cfg', null), QUEUE = LS.get('queue', []), ROSTER = LS.get('roster', {}), HIST = LS.get('hist', []);
+// للتسجيل الفوري: جداول الدورات وإعدادات الجلسات، وفارق ساعة الهاتف عن الخادم، ومسحات هذا الجهاز المقبولة
+var RMETA = LS.get('rmeta', null), SKEW = LS.get('skew', 0), DONE = LS.get('done', {});
 var ALPH = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
 var stream = null, track = null, scanning = false, lastCode = '', lastAt = 0, mode = 'scan', online = navigator.onLine;
 var canvas = document.createElement('canvas'), ctx = canvas.getContext('2d', { willReadFrequently: true });
@@ -179,7 +194,7 @@ var LOOK = {
   late:       { c: 'var(--late)', ic: '⏰', snd: [[880, .14], [660, .2]], vib: [60, 60, 60] },
   duplicate:  { c: 'var(--dup)',  ic: '↺', snd: [[700, .1]], vib: [30] },
   offline:    { c: 'var(--off)',  ic: '⇅', snd: [[880, .12], [990, .12]], vib: [60] },
-  pending:    { c: '#163846',     ic: '…', snd: [], vib: [] },
+  pending:    { c: '#2C1E3A',     ic: '…', snd: [], vib: [] },
   error:      { c: 'var(--bad)',  ic: '✕', snd: [[300, .35]], vib: [200, 80, 200] }
 };
 function kind(status) {
@@ -188,10 +203,12 @@ function kind(status) {
 }
 
 /* ===================== عرض النتيجة ===================== */
-var hideT = null;
-function showResult(status, title, name, msg, ms) {
+var hideT = null, CUR_SID = '';
+function showResult(status, title, name, msg, ms, fast, sid) {
+  CUR_SID = sid || '';
   var k = LOOK[kind(status)];
   var r = $('result');
+  $('rB').textContent = fast ? '⚡ فوري' : '';
   r.style.background = k.c; r.classList.add('on');
   $('rIc').textContent = k.ic; $('rT').textContent = title; $('rN').textContent = name || ''; $('rM').textContent = msg || '';
   if (k.snd.length) tone(k.snd);
@@ -205,7 +222,8 @@ function addHist(h) {
 function renderHist() {
   var colors = { present: 'var(--ok)', late: 'var(--late)', duplicate: 'var(--dup)', offline: 'var(--off)', pending: 'var(--soft)' };
   $('hist').innerHTML = HIST.map(function (h) {
-    return '<div class="item"><span class="s" style="background:' + (colors[h.status] || 'var(--bad)') + '"></span><span class="tm">' + hm(h.t) + '</span><span class="who"><b>' +
+    var ck = !h.fast ? '' : h.ok ? '<span class="ck ok" title="أكّده الخادم">✓✓</span>' : h.q ? '<span class="ck" title="سيُرسل عند عودة الاتصال">⇅</span>' : '<span class="ck" title="بانتظار تأكيد الخادم">✓</span>';
+    return '<div class="item"><span class="s" style="background:' + (colors[h.status] || 'var(--bad)') + '"></span><span class="tm">' + hm(h.t) + '</span>' + ck + '<span class="who"><b>' +
       esc(h.name || '—') + '</b> <span style="color:var(--soft)">' + esc(h.title) + '</span></span><span style="color:var(--soft);font-size:12px">' + esc(h.course || '') + '</span></div>';
   }).join('');
   var d = dayKey(Date.now()), n = HIST.filter(function (h) { return (h.status == 'present' || h.status == 'late' || h.status == 'offline') && dayKey(h.t) == d; }).length;
@@ -214,11 +232,17 @@ function renderHist() {
 
 /* ===================== الشبكة ===================== */
 function api(method, params, body) {
-  var url = CFG.api + (params ? '?' + Object.keys(params).map(function (k) { return k + '=' + encodeURIComponent(params[k]); }).join('&') : '');
+  var t0 = Date.now(), url = CFG.api + (params ? '?' + Object.keys(params).map(function (k) { return k + '=' + encodeURIComponent(params[k]); }).join('&') : '');
   var ctl = new AbortController(), to = setTimeout(function () { ctl.abort(); }, 20000);
   return fetch(url, { method: method, body: body ? JSON.stringify(body) : undefined, signal: ctl.signal, redirect: 'follow' })
     .then(function (r) { clearTimeout(to); if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-    .then(function (j) { setNet(true); if (!j.ok && j.error == 'auth') { authFail(); throw new Error('auth'); } return j; })
+    .then(function (j) {
+      setNet(true);
+      var t1 = Date.now();                                   // فارق ساعة الهاتف عن الخادم (من طلبات القراءة السريعة فقط)
+      if (method == 'GET' && j && j.now && t1 - t0 < 4000) { SKEW = j.now - Math.round((t0 + t1) / 2); LS.set('skew', SKEW); }
+      if (!j.ok && j.error == 'auth') { authFail(); throw new Error('auth'); }
+      return j;
+    })
     .catch(function (e) { clearTimeout(to); if (e.message != 'auth') setNet(false); throw e; });
 }
 function setNet(on) { online = on; $('net').className = 'dot ' + (on ? 'on' : 'off'); }
@@ -229,8 +253,12 @@ function authFail() {
 function loadRoster(manual) {
   return api('GET', { action: 'roster', key: CFG.key }).then(function (j) {
     var map = {};
-    (j.roster || []).forEach(function (r) { map[r[0]] = [r[1], r[2], r[3]]; });
+    (j.roster || []).forEach(function (r) { map[r[0]] = [r[1], r[2], r[3], r[4] || []]; });
     ROSTER = map; LS.set('roster', ROSTER); LS.set('rosterAt', Date.now());
+    if (j.courses && j.cfg && j.tz != null) { RMETA = { c: j.courses, cfg: j.cfg, tz: j.tz, day: j.day, at: Date.now() }; LS.set('rmeta', RMETA); }
+    var keep = {}, cut = addDays(zoned(srvNow()).key, -2);
+    Object.keys(DONE).forEach(function (k) { if (k.split('|')[1] >= cut) keep[k] = DONE[k]; });
+    DONE = keep; LS.set('done', DONE);
     if (manual) showResult('present', 'تم التحديث', Object.keys(map).length + ' طالب', '', 1500);
   }).catch(function () { if (manual) showResult('error', 'تعذّر التحديث', '', 'تحقق من الإنترنت'); });
 }
@@ -256,10 +284,12 @@ function syncNow(manual) {
     var done = {};
     (j.results || []).forEach(function (r) {
       done[r.sid] = 1;
-      HIST.forEach(function (h) { if (h.sid == r.sid) { h.status = r.status; h.title = r.title; h.name = r.name || h.name; h.course = r.course || h.course; } });
-      if (r.status != 'present' && r.status != 'late' && r.status != 'duplicate') {
-        tone(LOOK.error.snd);           // تنبيه: مسحة دون اتصال تبيّن أنها مرفوضة
-      }
+      HIST.forEach(function (h) {
+        if (h.sid != r.sid) return;
+        if (h.fast && h.status != r.status) correction(r, h.status);
+        else if (!h.fast && r.status != 'present' && r.status != 'late' && r.status != 'duplicate') tone(LOOK.error.snd);   // مسحة دون اتصال تبيّن أنها مرفوضة
+        h.status = r.status; h.title = r.title; h.name = r.name || h.name; h.course = r.course || h.course; h.ok = 1; h.q = 0;
+      });
     });
     QUEUE = QUEUE.filter(function (q) { return !done[q.sid]; });
     saveQueue(); LS.set('hist', HIST); renderHist();
@@ -278,6 +308,8 @@ function handle(code) {
   sha12(token).then(function (h) {
     var info = ROSTER[h];
     var flt = LS.get('course', '');
+    var at = srvNow(), loc = info ? decide(info, h, at, flt) : null;
+    if (loc) return instant(token, h, info, loc, at, flt, now);
     if (h && Object.keys(ROSTER).length && !info) { showResult('error', 'رمز غير مسجّل', '', 'قد يكون رمزًا قديمًا تم استبداله'); }
     else if (info && flt && info[2] != flt) { showResult('error', 'هذا الرمز لدورة أخرى', info[0], 'دورته: ' + info[1]); }
     else showResult('pending', 'جارٍ التحقق…', info ? info[0] : '', '', 15000);
@@ -290,6 +322,7 @@ function handle(code) {
       h0.status = r.status; h0.title = r.title; h0.name = r.name || h0.name; h0.course = r.course || h0.course;
       LS.set('hist', HIST); renderHist();
       showResult(r.status, r.title, r.name, [r.session, r.msg].filter(Boolean).join(' — '));
+      if (!info && (r.status == 'present' || r.status == 'late')) loadRoster();   // طالب جديد لم يكن في القائمة: نحدّثها ليصبح فوريًا
     }).catch(function (e) {
       if (e && e.message == 'auth') {                   // device disabled: don't pretend it was saved
         h0.status = 'auth'; h0.title = 'الجهاز غير مفعّل'; LS.set('hist', HIST); renderHist();
@@ -300,6 +333,95 @@ function handle(code) {
       showResult('offline', 'حُفظ وسيُرسل تلقائيًا', info ? info[0] : '', 'لا يوجد اتصال الآن. الوقت محفوظ بدقة.');
     });
   });
+}
+
+/* ===================== التسجيل الفوري =====================
+ * يقرّر الهاتف النتيجة لحظة المسح بنفس قواعد الخادم (الجدول، السماح المبكر، حد التأخير، التكرار)
+ * ويعرضها فورًا، ثم يرسل المسحة مع "لحظة القرار" فيحكم الخادم على نفس اللحظة بالضبط.
+ * إن خالف الخادم (مثلًا أُوقف الطالب قبل دقائق) يظهر شريط تصحيح أحمر مع صوت تنبيه.
+ * الرموز غير الموجودة في القائمة المحلية تنتظر الخادم كما في السابق.
+ */
+var DAYN = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+function p2(n) { return ('0' + n).slice(-2); }
+function srvNow() { return Date.now() + SKEW; }
+function zoned(ms) {
+  var d = new Date(ms + ((RMETA && RMETA.tz) != null ? RMETA.tz : 180) * 60000);
+  return { key: d.getUTCFullYear() + '-' + p2(d.getUTCMonth() + 1) + '-' + p2(d.getUTCDate()), sec: d.getUTCHours() * 3600 + d.getUTCMinutes() * 60 + d.getUTCSeconds(), wd: d.getUTCDay() };
+}
+function addDays(key, n) { var d = new Date(key + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); }
+function wday(key) { return new Date(key + 'T00:00:00Z').getUTCDay(); }
+function hms(sec) { return p2(Math.floor(sec / 3600)) + ':' + p2(Math.floor(sec % 3600 / 60)); }
+function nextText(c, key, sec, cfg) {
+  if (!c.x.length || !c.d.length) return 'لا يوجد جدول لهذه الدورة';
+  for (var d = 0; d < 14; d++) {
+    var k = addDays(key, d);
+    if (c.b && k > c.b) break;
+    if (c.d.indexOf(wday(k)) < 0) continue;
+    for (var i = 0; i < c.x.length; i++) {
+      if (d == 0 && c.x[i][1] - cfg.early * 60 <= sec) continue;
+      return 'الجلسة القادمة: ' + (d == 0 ? 'اليوم' : DAYN[wday(k)] + ' ' + k) + ' الساعة ' + hms(c.x[i][1]);
+    }
+  }
+  return 'لا توجد جلسات قادمة';
+}
+/** نسخة من resolveSession_ في الخادم. */
+function resolve(c, z, cfg) {
+  if (c.a && z.key < c.a) return { reason: 'الدورة تبدأ ' + c.a };
+  if (c.b && z.key > c.b) return { reason: 'انتهت الدورة في ' + c.b };
+  var lateMin = c.l == null ? cfg.late : c.l;
+  if (c.d.indexOf(z.wd) >= 0) for (var i = 0; i < c.x.length; i++) {
+    var s = c.x[i];
+    if (z.sec >= s[1] - cfg.early * 60 && z.sec <= s[2]) return { n: String(s[0]), label: s[3], late: z.sec > s[1] + lateMin * 60, mins: Math.floor((z.sec - s[1]) / 60) };
+  }
+  if (cfg.out) return { n: 'X', label: 'خارج الجدول', late: false };
+  return { reason: nextText(c, z.key, z.sec, cfg) };
+}
+function decide(info, hex, ms, flt) {
+  if (!RMETA || !RMETA.c || Date.now() - (RMETA.at || 0) > 86400000) return null;   // قائمة قديمة جدًا: ننتظر الخادم
+  var c = RMETA.c[info[2]], cfg = RMETA.cfg;
+  if (!c) return null;
+  if (c.s != 'نشطة') return { status: 'closed', title: 'الدورة غير نشطة', msg: '' };
+  if (flt && info[2] != flt) return { status: 'wrong_course', title: 'هذا الرمز لدورة أخرى', msg: 'دورته: ' + info[1] };
+  var z = zoned(ms), r = resolve(c, z, cfg);
+  if (!r.n) return { status: 'no_session', title: 'لا توجد جلسة الآن', msg: r.reason };
+  var key = hex + '|' + z.key + '|' + r.n, label = r.n == 'X' ? 'خارج الجدول' : 'الجلسة ' + r.n + ' (' + r.label + ')';
+  var mine = DONE[key], srv = RMETA.day == z.key && (info[3] || []).indexOf(r.n) >= 0;
+  if (mine || srv) return { status: 'duplicate', title: 'مسجّل مسبقًا', session: label, msg: mine ? 'سُجّل الساعة ' + hms(zoned(mine).sec) : 'سُجّل في هذه الجلسة', key: key };
+  return { status: r.late ? 'late' : 'present', title: r.late ? 'حضور متأخر' : 'تم تسجيل الحضور', session: label, msg: r.late ? 'متأخر ' + r.mins + ' دقيقة' : 'الساعة ' + hms(z.sec), key: key };
+}
+function instant(token, hex, info, loc, at, flt, now) {
+  var good = loc.status == 'present' || loc.status == 'late';
+  var item = { sid: uuid(), code: token, t: now, st: at };
+  showResult(loc.status, loc.title, info[0], [loc.session, loc.msg].filter(Boolean).join(' — '), good ? 1600 : 2400, true, item.sid);
+  if (good) { DONE[loc.key] = at; LS.set('done', DONE); }
+  var h0 = { sid: item.sid, t: now, status: loc.status, title: loc.title, name: info[0], course: info[1], fast: 1 };
+  addHist(h0);
+  api('POST', null, { key: CFG.key, now: Date.now(), course: flt, scans: [item] }).then(function (j) {
+    if (!j.ok) throw new Error(j.error || 'server');
+    var r = j.results[0];
+    if (r.status != loc.status) {
+      correction(r, loc.status);
+      if (good && r.status != 'present' && r.status != 'late') { delete DONE[loc.key]; LS.set('done', DONE); }
+    }
+    h0.status = r.status; h0.title = r.title; h0.name = r.name || h0.name; h0.course = r.course || h0.course; h0.ok = 1;
+    LS.set('hist', HIST); renderHist();
+  }).catch(function (e) {
+    if (e && e.message == 'auth') { h0.status = 'auth'; h0.title = 'الجهاز غير مفعّل'; if (good) { delete DONE[loc.key]; LS.set('done', DONE); } LS.set('hist', HIST); renderHist(); return; }
+    item.offline = true; QUEUE.push(item); saveQueue();        // النتيجة معروضة، والإرسال عند عودة الاتصال بنفس لحظة القرار
+    h0.q = 1; LS.set('hist', HIST); renderHist();
+  });
+}
+var fixT = null;
+function correction(r, was) {
+  var soft = (was == 'present' && r.status == 'late') || (was == 'late' && r.status == 'present') || r.status == 'duplicate';
+  var f = $('fix');
+  if (CUR_SID && CUR_SID == r.sid && $('result').classList.contains('on'))       // ما زالت نتيجته على الشاشة: نستبدلها فورًا
+    showResult(r.status, 'تصحيح: ' + r.title, r.name, [r.session, r.msg].filter(Boolean).join(' — '), soft ? 2200 : 4000);
+  f.className = 'fix on' + (soft ? ' soft' : '');
+  f.innerHTML = '<span class="x">' + (soft ? 'ℹ' : '⚠') + '</span><span>تصحيح — <b>' + esc(r.name || '') + '</b>: ' + esc(r.title) + (r.msg ? '<br><span style="font-weight:600;opacity:.9">' + esc(r.msg) + '</span>' : '') + '</span>';
+  tone(soft ? LOOK.duplicate.snd : LOOK.error.snd);
+  if (!soft && navigator.vibrate) navigator.vibrate(LOOK.error.vib);
+  clearTimeout(fixT); fixT = setTimeout(function () { f.classList.remove('on'); }, soft ? 5000 : 9000);
 }
 
 /* ===================== القراءة =====================
@@ -452,7 +574,7 @@ function openMenu() {
 function closeSheets() { $('manual').classList.remove('on'); $('menu').classList.remove('on'); }
 
 /* ===================== التشغيل ===================== */
-setInterval(function () { $('clock').textContent = hm(Date.now()); }, 1000);
+setInterval(function () { $('clock').textContent = RMETA ? hms(zoned(srvNow()).sec) : hm(Date.now()); }, 1000);   // ساعة النظام (دمشق، مصحّحة)
 $('clock').textContent = hm(Date.now());
 renderHist(); saveQueue();
 if (!CFG) {
@@ -465,7 +587,7 @@ if (!CFG) {
     if (j.device && j.device != CFG.name) { CFG.name = j.device; LS.set('cfg', CFG); $('devname').textContent = j.device; }
   }).catch(function () {});
   loadCourses();
-  if (!LS.get('rosterAt', 0) || Date.now() - LS.get('rosterAt', 0) > 600000) loadRoster();
+  if (!RMETA || !LS.get('rosterAt', 0) || Date.now() - LS.get('rosterAt', 0) > 600000) loadRoster();
   setInterval(function () { syncNow(); }, 5000);
   setInterval(function () { loadRoster(); }, 600000);
   setInterval(function () { api('GET', { action: 'ping', key: CFG.key }).catch(function () {}); }, 300000);   // "I'm alive" for the admin alerts
